@@ -1,0 +1,26 @@
+SCHOOL DAYS HQ MODDING TOOLKIT
+ATUALIZACAO INCREMENTAL v0.5 -> v0.6
+
+1. Feche qualquer terminal que esteja executando uma pipeline do toolkit.
+2. Extraia este ZIP diretamente na raiz de SchoolDaysHQ-Modding-Toolkit.
+3. Confirme a substituicao dos arquivos existentes.
+4. Execute run_tests.bat. O resultado esperado e: 20 testes, OK.
+
+PRINCIPAIS MUDANCAS
+
+- unpack-all para processar todos os GPKs da pasta Packs.
+- repack-all experimental para workspaces concluidos.
+- progresso por archive e por grupo de entradas.
+- retomada no nivel de GPK concluido.
+- relatorios JSON incrementais para interrupcoes e erros.
+- verificacao preventiva de espaco livre.
+- leitura, extracao, copia e compressao em blocos de 1 MiB.
+- fingerprint rapido para nao reutilizar um repack apos novas edicoes.
+- validacao do arquivo temporario antes de publicar a saida final.
+
+PRIMEIRO COMANDO RECOMENDADO
+
+py -3 pipelines\unpack_all_gpk.py "D:\SCHOOL DAYS HQ\Overflow\SCHOOLDAYS HQ\Packs" --key-report "reports\ciphercode_report.json" --workspace "workspace"
+
+Archives Ini e Script ja extraidos corretamente serao ignorados. Nenhum GPK
+original e alterado.

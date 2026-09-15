@@ -1,0 +1,35 @@
+SCHOOL DAYS HQ MODDING TOOLKIT
+ATUALIZACAO INCREMENTAL v0.7 -> v0.8
+
+1. Feche qualquer pipeline do toolkit.
+2. Extraia este ZIP diretamente na raiz de SchoolDaysHQ-Modding-Toolkit.
+3. Confirme a substituicao dos arquivos existentes.
+4. Execute run_tests.bat. O resultado esperado e: 35 testes, OK.
+
+PRINCIPAIS MUDANCAS
+
+- paleta CMAP deterministica com 256 cores unicas;
+- exportacao colorida e reversivel dos IDs de regiao;
+- overlay automatico sobre o PNG correspondente;
+- fallback para PNG base nas variantes WIDE/FULL/NOTE;
+- redimensionamento apenas da visualizacao de overlay;
+- exportacao em lote dos 137 CMAPs;
+- manifesto com hashes, dimensoes, IDs e contagens;
+- legenda HTML com cores e IDs realmente utilizados;
+- build que gera somente CMAPs realmente modificados;
+- staging separado, sem alterar o workspace;
+- bloqueio de antialiasing, cores desconhecidas, alpha e dimensoes alteradas;
+- bloqueio padrao de IDs que nao existiam no CMAP original;
+- bloqueio quando o CMAP original mudou depois da exportacao;
+- relatorio de build fora da arvore de assets.
+
+PRIMEIRO COMANDO
+
+py -3 pipelines\export_cmap_project.py "workspace\System" --output "cmap_project"
+
+DEPOIS DE EDITAR SOMENTE OS PNGs EM cmap_project\editable
+
+py -3 pipelines\build_cmap_project.py "cmap_project" --output "cmap_staged"
+
+O primeiro comando apenas le o workspace. O segundo escreve em cmap_staged.
+Nenhum GPK e nenhum arquivo de workspace e substituido automaticamente.

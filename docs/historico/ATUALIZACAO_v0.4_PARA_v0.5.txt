@@ -1,0 +1,17 @@
+ATUALIZACAO INCREMENTAL v0.4-dev -> v0.5-dev
+================================================
+
+Novidades:
+- primeiro writer GPK/STACK por referencia;
+- preservacao do prefixo PE e campos desconhecidos;
+- copia binaria de entradas nao modificadas;
+- recompressao Zlib de entradas modificadas;
+- reconstrucao, compressao e criptografia XOR do indice;
+- validacao automatica do indice reconstruido;
+- recusa explicita de sobrescrever o GPK original;
+- relatorio de build ao lado do GPK de saida;
+- teste automatizado de repack sem alteracao e com arquivo modificado.
+
+Nesta etapa, adicionar ou remover arquivos ainda nao e suportado.
+Teste primeiro somente com Ini.GPK e mantenha o original intacto.
+

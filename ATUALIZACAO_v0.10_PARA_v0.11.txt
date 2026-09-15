@@ -1,0 +1,21 @@
+School Days HQ Modding Toolkit — atualização v0.10 -> v0.11.1-dev
+
+Feche o toolkit e extraia o ZIP na pasta atual, substituindo os arquivos de
+código e documentação contidos nele. Abra run_gui.bat. Requer Python 3.10+ com Tkinter.
+
+1. Selecione manualmente o GARbro.exe, mantendo seus arquivos acompanhantes.
+2. No GARbro, extraia cada GPK para uma pasta exclusiva, sem converter formatos.
+   Usar o nome do GPK nessa pasta ajuda, mas não é obrigatório.
+3. Edite e selecione no toolkit a instalação do jogo, o GPK de referência,
+   a pasta de alterações, a saída e os relatórios.
+4. Use Conferir alterações e Gerar GPK.
+5. Antes de trocar o GPK em Packs, feche o jogo e o GARbro para liberar o arquivo.
+   Guarde uma cópia do GPK anterior.
+
+Ausências mantêm entradas da referência. Avisos de formato permitem montar.
+Arquivos novos são mostrados como não incluídos. Inclusão, remoção e renomeação
+estão fora desta entrega. Interface anterior/.sdmod e CLI preservadas.
+
+Não é necessário repetir os testes já validados no jogo. O ZIP não contém GPKs,
+executáveis, workspace, backups, relatórios, outputs ou configurações pessoais.
+Guia, resultados e lista de arquivos: docs/GARBRO_REPACK.md.

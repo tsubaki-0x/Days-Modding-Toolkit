@@ -1,0 +1,18 @@
+ATUALIZACAO INCREMENTAL v0.3-dev -> v0.4-dev
+================================================
+
+Extraia diretamente na pasta principal do toolkit e substitua os arquivos.
+
+Novidades:
+- extrator GPK/STACK funcional em Python;
+- recomposicao do header de cada entrada a partir do indice;
+- descompactacao Deflate/Zlib;
+- validacao rigorosa de tamanho descompactado;
+- protecao contra path traversal;
+- metadados de round-trip em .sdhq/archive.json;
+- hash SHA-256 de cada arquivo extraido;
+- pipeline unpack_gpk.py;
+- teste completo usando um GPK Stack sintetico.
+
+O repack permanece bloqueado ate validarmos a extracao em Ini.GPK e Script.GPK.
+

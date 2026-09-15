@@ -1,0 +1,31 @@
+SCHOOL DAYS HQ MODDING TOOLKIT
+ATUALIZACAO INCREMENTAL v0.6 -> v0.7
+
+1. Feche qualquer pipeline do toolkit.
+2. Extraia este ZIP diretamente na raiz de SchoolDaysHQ-Modding-Toolkit.
+3. Confirme a substituicao dos arquivos existentes.
+4. Execute run_tests.bat. O resultado esperado e: 29 testes, OK.
+
+PRINCIPAIS MUDANCAS
+
+- deteccao correta de ASF/WMV, CMAP, INI e TXT;
+- progresso no scan-assets a cada 1000 arquivos;
+- asset_summary.json e asset_summary.txt compactos por GPK e formato;
+- reclassificacao do inventario existente sem nova varredura;
+- conversor CMAP para PNG grayscale 8-bit;
+- conversor PNG para CMAP;
+- validacao lossless CMAP -> PNG -> CMAP;
+- relatorio de dimensoes e valores usados nos 137 mapas;
+- validacao de CRC, filtros, cor, alpha, tamanho e seguranca do PNG;
+- documentacao tecnica inicial de CMAP.
+
+PRIMEIRO COMANDO RECOMENDADO
+
+py -3 pipelines\summarize_assets.py "reports\asset_inventory.json" --output "reports"
+
+SEGUNDO COMANDO RECOMENDADO
+
+py -3 pipelines\verify_cmap.py "workspace\System" --output "reports\cmap_roundtrip.json"
+
+Esses comandos apenas leem o workspace e escrevem novos relatorios. Nenhum GPK
+original e alterado.

@@ -1,0 +1,33 @@
+SCHOOL DAYS HQ MODDING TOOLKIT - ATUALIZACAO v0.9 PARA v0.10
+
+1. Extraia este ZIP na raiz do SchoolDaysHQ-Modding-Toolkit.
+2. Confirme a substituicao dos arquivos existentes.
+3. Nao apague workspace, reports, output ou backups.
+
+NOVO NA v0.10
+
+- Projeto de mod com identidade, autor, versao e GPKs-alvo.
+- Build .sdmod contendo apenas os arquivos internos modificados.
+- Manifesto com hashes originais e modificados.
+- Inspecao de integridade antes da aplicacao.
+- Aplicacao transacional somente em workspace limpo.
+- Backup e remocao segura do mod no workspace.
+- Bloqueio de conflitos, arquivos novos, caminhos inseguros e pacotes adulterados.
+
+COMANDOS
+
+py -3 pipelines\create_mod_project.py "mods\meu-mod" --id "autor.meu-mod" --name "Meu Mod" --author "Autor" --archives System
+
+py -3 pipelines\build_mod_package.py "mods\meu-mod" --workspace "workspace" --output "dist" --asset-baseline "reports\asset_baseline.json"
+
+py -3 pipelines\inspect_mod_package.py "dist\autor.meu-mod-1.0.0.sdmod" --report "reports\meu_mod_inspection.json"
+
+py -3 pipelines\apply_mod_package.py "dist\autor.meu-mod-1.0.0.sdmod" --workspace "workspace"
+
+py -3 pipelines\remove_mod.py "autor.meu-mod" --workspace "workspace"
+
+IMPORTANTE
+
+O .sdmod nao inclui GPKs originais nem arquivos inalterados. A aplicacao atua
+somente no workspace. Depois, use repack_gpk.py com o GPK original como
+referencia. Consulte docs\MOD_PACKAGES.md.

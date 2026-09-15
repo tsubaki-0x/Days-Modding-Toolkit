@@ -1,0 +1,26 @@
+ATUALIZACAO INCREMENTAL v0.1-dev -> v0.2-dev
+================================================
+
+1. Feche qualquer terminal que esteja executando o toolkit.
+2. Abra a pasta principal SchoolDaysHQ-Modding-Toolkit.
+3. Extraia o conteudo deste ZIP diretamente dentro dela.
+4. Quando o Windows perguntar, escolha "Substituir os arquivos no destino".
+5. Execute run_tests.bat. O resultado esperado e: Ran 11 tests / OK.
+
+Este pacote nao contem nem altera:
+- samples/packs
+- samples/extracted
+- reports existentes
+- workspace
+- output
+- backups
+
+Alteracoes da v0.2:
+- leitura dos 32 bytes finais dos GPKs;
+- deteccao de STKFile0PIDX e STKFile0PACKFILE;
+- calculo do tamanho e offset do indice Stack;
+- opcao --skip-hash para varredura rapida;
+- progresso por archive;
+- deteccao de ORS e .DS_STORE;
+- 11 testes automatizados.
+

@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdhq-modding-toolkit"
+version = "0.11.1.dev0"
+description = "Research-first modding toolkit for School Days HQ"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "School Days HQ Modding Toolkit contributors" }]
+
+[project.scripts]
+sdhq = "sdhq_toolkit.cli:main"
+
+[project.gui-scripts]
+sdhq-gui = "sdhq_toolkit.gui.app:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"sdhq_toolkit.gui" = ["assets/*.png"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

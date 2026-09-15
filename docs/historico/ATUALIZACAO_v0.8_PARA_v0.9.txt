@@ -1,0 +1,36 @@
+SCHOOL DAYS HQ MODDING TOOLKIT
+ATUALIZACAO INCREMENTAL v0.8 -> v0.9
+
+1. Feche qualquer pipeline do toolkit.
+2. Extraia este ZIP diretamente na raiz de SchoolDaysHQ-Modding-Toolkit.
+3. Confirme a substituicao dos arquivos existentes.
+4. Execute run_tests.bat. O resultado esperado e: 42 testes, OK.
+
+PRINCIPAIS MUDANCAS
+
+- linha de base limpa baseada nos hashes da extracao GPK;
+- validacao completa de PNG editado: chunks, CRC, zlib e propriedades;
+- validacao completa de Ogg: paginas, CRC, codec, canais e sample rate;
+- validacao estrutural de WMV/ASF, streams, codecs e dimensoes;
+- validacao unificada de CMAP, ORS, INI e TXT;
+- bloqueio padrao de DAT e outros formatos desconhecidos modificados;
+- deteccao de arquivos ausentes e extras;
+- relatorio compacto que detalha somente mudancas e falhas;
+- preflight opcional integrado aos comandos repack e repack-all;
+- progresso visivel durante hashing e preflight;
+- 42 testes automatizados.
+
+PRIMEIRO COMANDO - USE UM WORKSPACE LIMPO
+
+py -3 pipelines\create_asset_baseline.py "workspace" --output "reports\asset_baseline.json" --progress-every 500
+
+RESULTADO ESPERADO NA EXTRACAO COMPLETA VALIDADA
+
+[PASS] Asset baseline: 69936 passed, 0 failed.
+
+DEPOIS DE MODIFICAR ASSETS
+
+py -3 pipelines\validate_assets.py "workspace" --baseline "reports\asset_baseline.json" --output "reports\asset_validation.json" --progress-every 500
+
+Os comandos apenas leem o workspace e escrevem relatorios. Nenhum GPK e nenhum
+asset e substituido automaticamente. Consulte docs\ASSET_VALIDATION.md.

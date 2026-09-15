@@ -1,0 +1,17 @@
+ATUALIZACAO INCREMENTAL v0.2-dev -> v0.3-dev
+================================================
+
+Extraia este ZIP diretamente na pasta principal do toolkit e confirme a
+substituicao dos arquivos existentes.
+
+Novidades:
+- extracao segura do recurso CIPHERCODE/CODE sem executar o EXE do jogo;
+- normalizacao da chave conforme o comportamento do GARbro;
+- descriptografia XOR do indice GPK/STACK;
+- descompactacao Zlib do indice;
+- parser inicial da tabela de entradas;
+- pipelines extract_ciphercode.py e read_gpk_index.py;
+- novos testes automatizados.
+
+O patch nao contem e nao altera arquivos do jogo, samples ou relatorios.
+
