@@ -1,3 +1,8 @@
+
+<img width="1672" height="941" alt="School Days" src="https://github.com/user-attachments/assets/f372b6c5-15a3-4e64-ba90-8981ff755cd6" />
+
+
+
 # School Days HQ Modding Toolkit
 
 Ferramenta não oficial para reconstruir arquivos **GPK de School Days HQ v1.02**,
