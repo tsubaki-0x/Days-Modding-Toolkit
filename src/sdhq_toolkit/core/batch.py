@@ -126,7 +126,7 @@ def _base_report(operation: str, source: Path, destination: Path) -> dict:
 def unpack_all(
     packs: Path,
     workspace: Path,
-    key: bytes,
+    key: bytes | None,
     report_path: Path,
     *,
     progress: BatchProgress | None = None,
