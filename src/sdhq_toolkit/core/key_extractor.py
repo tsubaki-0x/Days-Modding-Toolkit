@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from ..utils.windows_resources import normalize_ciphercode, read_named_resource
+from ..formats.gpk.index import KNOWN_INDEX_KEYS
 
 
 def find_ciphercode(game_directory: Path) -> dict:
@@ -38,6 +39,30 @@ def find_ciphercode(game_directory: Path) -> dict:
                 "checked_executables": checked,
                 "failures": failures,
             }
+
+    # Shiny Days does not need to expose the same named CIPHERCODE resource.
+    # As a fallback, scan the executable bytes for the known 16-byte PIDX keys
+    # confirmed by this project. This is read-only and records the exact offset.
+    for executable in candidates:
+        try:
+            data = executable.read_bytes()
+        except OSError as exc:
+            failures.append({"executable": str(executable), "error": str(exc)})
+            continue
+        for key_name, key in KNOWN_INDEX_KEYS:
+            offset = data.find(key)
+            if offset >= 0:
+                return {
+                    "found": True,
+                    "executable": str(executable),
+                    "source": "literal_scan",
+                    "key_name": key_name,
+                    "key_offset": offset,
+                    "key_size": len(key),
+                    "key_hex": key.hex().upper(),
+                    "checked_executables": checked,
+                    "failures": failures,
+                }
 
     return {
         "found": False,
