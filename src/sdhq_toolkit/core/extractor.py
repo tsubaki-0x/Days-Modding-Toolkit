@@ -9,7 +9,7 @@ from ..formats.gpk.reader import GPKReader
 def unpack_archive(
     archive: Path,
     workspace: Path,
-    key: bytes,
+    key: bytes | None,
     *,
     progress: Callable[[int, int, str, int], None] | None = None,
     paths=None,
