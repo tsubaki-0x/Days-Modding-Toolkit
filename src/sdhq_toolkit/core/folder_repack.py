@@ -30,15 +30,19 @@ class FolderRepackService:
     def preview(self, *, cancel=None, progress=None):
         if not self.reference.is_file() or not self.folder.is_dir():
             raise ValueError("Selecione um GPK de referência e uma pasta de alterações existentes.")
-        if self.key is None:
-            if self.game is None:
-                raise ValueError("Selecione a instalação do jogo para ler a chave do GPK.")
+        if self.key is None and self.game is not None:
             result = find_ciphercode(self.game)
-            if not result['found']:
-                raise ValueError("CIPHERCODE não encontrado na instalação selecionada.")
-            self.key = bytes.fromhex(result['key_hex'])
+            if result["found"]:
+                self.key = bytes.fromhex(result["key_hex"])
         reference_stamp = stamp(self.reference)
+        # The archive is authoritative: supplied/extracted key first, then known
+        # School Days HQ / Shiny Days PIDX variants.
         index = read_stack_index(self.reference, self.key)
+        self.key = (
+            bytes.fromhex(index["index_key_hex"])
+            if index.get("index_key_hex")
+            else None
+        )
         entries, rows, warnings, hashes = [], [], [], {}
         declared = set()
         for number, entry in enumerate(index['entries'], 1):
@@ -100,7 +104,13 @@ class FolderRepackService:
         return dict(operation='folder_preview', status='WARN' if warnings else 'PASS',
                     reference=str(self.reference), folder=str(self.folder), reference_stamp=reference_stamp,
                     files=rows, warnings=warnings, extras=extras, expected_hashes=hashes,
-                    metadata=dict(archive_size=index['archive_size'], entries=entries),
+                    metadata=dict(
+                        archive_size=index['archive_size'],
+                        entries=entries,
+                        index_key_name=index.get('index_key_name'),
+                        index_key_hex=index.get('index_key_hex'),
+                        index_codec=index.get('index_codec'),
+                    ),
                     replacements=sum(row['state'] == 'substituir' for row in rows),
                     unchanged=sum(row['state'] == 'igual' for row in rows),
                     retained=sum(row['state'] == 'manter referência' for row in rows))
@@ -123,4 +133,6 @@ class FolderRepackService:
         return dict(report, operation='folder_repack', status=plan['status'],
                     warnings=plan['warnings'], files=plan['files'],
                     message='GPK gerado com avisos' if plan['warnings'] else 'GPK gerado',
-                    game_compatibility='Não garantida; teste no jogo.')
+                    game_compatibility='Estrutura GPK validada; teste a edição no jogo.',
+                    index_key_name=report.get('index_key_name'),
+                    index_codec=report.get('index_codec'))
