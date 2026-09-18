@@ -19,7 +19,7 @@ from .scroll_form import ScrollForm
 class RepackApplication:
     def __init__(self, root):
         self.root = root
-        root.title(f'School Days HQ ModToolkit {__version__} — Repack')
+        root.title(f'Days ModToolkit {__version__} — School Days HQ / Shiny Days')
         root.geometry(f'{min(1460, root.winfo_screenwidth() - 60)}x{min(900, root.winfo_screenheight() - 100)}')
         root.minsize(760, 540)
         self.style = apply_theme(root)
@@ -51,13 +51,13 @@ class RepackApplication:
         results.columnconfigure(0, weight=1)
         results.rowconfigure(0, weight=1)
         self.header = add_header(frame, __version__)
-        ttk.Label(frame, text='Extraia no GARbro. Edite seus arquivos. Monte aqui.', font=('Segoe UI', 12, 'bold')).pack(anchor='w')
+        ttk.Label(frame, text='School Days HQ / Shiny Days — extraia no GARbro, edite e monte aqui.', font=('Segoe UI', 12, 'bold')).pack(anchor='w')
         ttk.Label(frame, text='Use uma pasta exclusiva por GPK, preservando os caminhos internos e os formatos.', wraplength=880).pack(anchor='w', pady=(4, 12))
         fields = ttk.LabelFrame(frame, text='  01  /  Localizações  ', padding=10)
         fields.pack(fill='x')
         fields.columnconfigure(1, weight=1)
         self.values = {}
-        labels = [('garbro', 'GARbro.exe (opcional)', True), ('game', 'Instalação do jogo (chave)', False),
+        labels = [('garbro', 'GARbro.exe (opcional)', True), ('game', 'Instalação do jogo (opcional)', False),
                   ('reference', 'GPK de referência', True), ('folder', 'Pasta com as alterações', False),
                   ('output', 'Pasta de saída', False), ('reports', 'Pasta de relatórios', False)]
         for row, (key, label, file) in enumerate(labels):
@@ -163,7 +163,7 @@ class RepackApplication:
         if self.jobs.busy:
             raise ValueError('Aguarde ou cancele a operação atual.')
         values = {key: var.get().strip() for key, var in self.values.items()}
-        for key in ('reference', 'folder', 'game', 'output', 'reports'):
+        for key in ('reference', 'folder', 'output', 'reports'):
             if not values[key]:
                 raise ValueError('Preencha a localização: ' + key)
         folder = Path(values['folder']).resolve()
@@ -171,7 +171,7 @@ class RepackApplication:
         if reports == folder or folder in reports.parents:
             raise ValueError('Escolha relatórios fora da pasta de alterações.')
         self.save()
-        service = FolderRepackService(values['reference'], folder, values['game'])
+        service = FolderRepackService(values['reference'], folder, values['game'] or None)
         operation = (lambda **kw: service.build(values['output'], **kw)) if build else service.preview
         self.jobs.start('Gerar GPK' if build else 'Conferir alterações', operation, reports)
         for control in self.controls:
