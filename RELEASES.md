@@ -1,3 +1,21 @@
+# School Days HQ / Shiny Days Modding Toolkit — v0.12.0-dev
+
+## Destaques
+
+- Suporte de container GPK/STACK para **School Days HQ v1.02** e **Shiny Days 1.01e**.
+- Autodetecção da chave PIDX por archive.
+- Chave Shiny Days confirmada: `F0 D0 BC 05 54 AC 68 A9 F1 7C 8E 3D 64 0B F3 AA`.
+- Repack preserva a chave efetiva da referência.
+- Fluxo GARbro funciona sem exigir diretório do jogo.
+- `--key-report` opcional na CLI.
+- Testes multi-game adicionados.
+
+A compatibilidade desta versão é da camada GPK/STACK; formatos internos específicos de Shiny Days continuam sujeitos a teste no jogo.
+
+Veja [docs/RELEASE_v0.12.md](docs/RELEASE_v0.12.md).
+
+---
+
 # School Days HQ Modding Toolkit — v0.11.1-dev
 
 Texto preparado para a release do GitHub.
