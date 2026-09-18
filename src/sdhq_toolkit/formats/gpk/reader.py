@@ -17,7 +17,7 @@ EntryProgress = Callable[[int, int, str, int], None]
 class GPKReader:
     """Read and extract confirmed Stack GPK archives."""
 
-    def __init__(self, archive: Path, key: bytes) -> None:
+    def __init__(self, archive: Path, key: bytes | None = None) -> None:
         self.archive = archive.resolve()
         self.key = key
 
