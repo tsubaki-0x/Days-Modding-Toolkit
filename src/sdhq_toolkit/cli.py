@@ -42,7 +42,7 @@ from .formats.cmap.project import build_cmap_project, export_cmap_project
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="sdhq", description="School Days HQ Modding Toolkit")
+    parser = argparse.ArgumentParser(prog="sdhq", description="School Days HQ / Shiny Days Modding Toolkit")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     inventory = subparsers.add_parser("inventory", help="Scan GPK archives and extracted files")
@@ -168,7 +168,7 @@ def build_parser() -> argparse.ArgumentParser:
     unpack = subparsers.add_parser("unpack", help="Extract or resume a GPK, optionally selecting indexed members")
     unpack.add_argument("archive", type=Path)
     unpack.add_argument("--workspace", type=Path, default=Path("workspace"))
-    unpack.add_argument("--key-report", type=Path, required=True)
+    unpack.add_argument("--key-report", type=Path, help="Optional CIPHERCODE/PIDX key report; known game keys are auto-detected when omitted")
     unpack.add_argument("--member", action="append", help="Extract only this indexed path; repeat for multiple files")
 
     unpack_all_parser = subparsers.add_parser(
@@ -177,7 +177,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     unpack_all_parser.add_argument("packs", type=Path)
     unpack_all_parser.add_argument("--workspace", type=Path, default=Path("workspace"))
-    unpack_all_parser.add_argument("--key-report", type=Path, required=True)
+    unpack_all_parser.add_argument("--key-report", type=Path, help="Optional CIPHERCODE/PIDX key report; known game keys are auto-detected when omitted")
     unpack_all_parser.add_argument(
         "--report",
         type=Path,
@@ -191,7 +191,7 @@ def build_parser() -> argparse.ArgumentParser:
     repack.add_argument("directory", type=Path)
     repack.add_argument("--reference", type=Path, required=True)
     repack.add_argument("--output", type=Path, default=Path("output"))
-    repack.add_argument("--key-report", type=Path, required=True)
+    repack.add_argument("--key-report", type=Path, help="Optional CIPHERCODE/PIDX key report; known game keys are auto-detected when omitted")
     repack.add_argument("--asset-baseline", type=Path)
     repack.add_argument("--asset-progress-every", type=int, default=500)
 
@@ -202,7 +202,7 @@ def build_parser() -> argparse.ArgumentParser:
     repack_all_parser.add_argument("workspace", type=Path)
     repack_all_parser.add_argument("--references", type=Path, required=True)
     repack_all_parser.add_argument("--output", type=Path, default=Path("output"))
-    repack_all_parser.add_argument("--key-report", type=Path, required=True)
+    repack_all_parser.add_argument("--key-report", type=Path, help="Optional CIPHERCODE/PIDX key report; known game keys are auto-detected when omitted")
     repack_all_parser.add_argument(
         "--report",
         type=Path,
@@ -219,7 +219,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     index = subparsers.add_parser("read-index", help="Decrypt and parse a GPK/STACK index")
     index.add_argument("archive", type=Path)
-    index.add_argument("--key-report", type=Path, required=True)
+    index.add_argument("--key-report", type=Path, help="Optional CIPHERCODE/PIDX key report; known game keys are auto-detected when omitted")
     index.add_argument("--output", type=Path)
 
     mod_create = subparsers.add_parser("mod-create", help="Create a distributable mod project")
@@ -458,7 +458,7 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
             print("[PASS] Verificações básicas concluídas.")
         elif args.command == "unpack":
-            key_bytes = load_key_report(args.key_report)
+            key_bytes = load_key_report(args.key_report) if args.key_report else None
             destination, metadata = unpack_archive(args.archive, args.workspace, key_bytes, paths=args.member)
             extracted = sum(entry.get("extracted", True) for entry in metadata["entries"])
             print(f"[PASS] {extracted}/{metadata['entry_count']} entries extracted from {args.archive.name}.")
@@ -466,7 +466,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "unpack-all":
             if args.progress_every < 1:
                 raise ValueError("--progress-every must be at least 1")
-            key_bytes = load_key_report(args.key_report)
+            key_bytes = load_key_report(args.key_report) if args.key_report else None
             report = unpack_all(
                 args.packs,
                 args.workspace,
@@ -512,7 +512,7 @@ def main(argv: list[str] | None = None) -> int:
                     f"[PASS] Asset preflight: {asset_report['modified']} modified, "
                     f"{asset_report['warnings']} warning(s)."
                 )
-            key_bytes = load_key_report(args.key_report)
+            key_bytes = load_key_report(args.key_report) if args.key_report else None
             output, report = repack_archive(args.directory, args.reference, args.output, key_bytes)
             build_report = output.with_suffix(output.suffix + ".build.json")
             build_report.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -546,7 +546,7 @@ def main(argv: list[str] | None = None) -> int:
                     f"[PASS] Asset preflight: {asset_report['modified']} modified, "
                     f"{asset_report['warnings']} warning(s)."
                 )
-            key_bytes = load_key_report(args.key_report)
+            key_bytes = load_key_report(args.key_report) if args.key_report else None
             report = repack_all(
                 args.workspace,
                 args.references,
@@ -578,7 +578,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"[PASS] CIPHERCODE found ({report['key_size']} bytes).")
             print(f"[OK] Report: {args.output.resolve()}")
         elif args.command == "read-index":
-            key_bytes = load_key_report(args.key_report)
+            key_bytes = load_key_report(args.key_report) if args.key_report else None
             report = read_stack_index(args.archive, key_bytes)
             output = args.output or Path("reports") / f"{args.archive.stem}_index.json"
             save_index_report(report, output)
