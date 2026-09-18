@@ -24,7 +24,7 @@ class GPKWriter:
     intentionally unsupported in this stage.
     """
 
-    def __init__(self, reference: Path, key: bytes) -> None:
+    def __init__(self, reference: Path, key: bytes | None = None) -> None:
         self.reference = reference.resolve()
         self.key = key
 
@@ -129,6 +129,7 @@ class GPKWriter:
             raise FileNotFoundError(f"Missing extraction metadata: {metadata_path}")
         metadata = overlay_metadata if overlay_metadata is not None else json.loads(metadata_path.read_text(encoding="utf-8"))
         reference = read_stack_index(self.reference, self.key)
+        effective_key = bytes.fromhex(reference["index_key_hex"]) if reference.get("index_key_hex") else None
         from ...core.partial import check_reference
         check_reference(metadata, reference)
         reference_entries = reference["entries"]
@@ -244,16 +245,18 @@ class GPKWriter:
                     + bytes.fromhex(reference["index_trailer_hex"])
                 )
                 original_prefix = bytes.fromhex(reference["index_prefix_hex"])
-                encrypted_index = xor_with_repeating_key(
-                    original_prefix + zlib.compress(raw_index, level=9),
-                    self.key,
+                plain_index = original_prefix + zlib.compress(raw_index, level=9)
+                encrypted_index = (
+                    xor_with_repeating_key(plain_index, effective_key)
+                    if effective_key is not None
+                    else plain_index
                 )
                 rebuilt.write(encrypted_index)
                 rebuilt.write(INDEX_SIGNATURE)
                 rebuilt.write(struct.pack("<I", len(encrypted_index)))
                 rebuilt.write(ARCHIVE_SIGNATURE)
 
-            validation = read_stack_index(temporary, self.key)
+            validation = read_stack_index(temporary, effective_key)
             if cancel:
                 cancel.check()
             if validation["entry_count"] != len(reference_entries):
@@ -277,6 +280,9 @@ class GPKWriter:
             "unchanged_entries": len(build_entries) - modified_count,
             "output_size": output.stat().st_size,
             "index_size": validation["index_size"],
+            "index_key_name": validation.get("index_key_name"),
+            "index_key_hex": validation.get("index_key_hex"),
+            "index_codec": validation.get("index_codec"),
             "workspace_stat_fingerprint": workspace_stat_fingerprint(
                 source_directory,
                 (entry["path"] for entry in metadata_entries),
