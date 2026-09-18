@@ -37,7 +37,7 @@ class Application:
         self.allow_unknown = tk.BooleanVar(value=False)
         self.compatibility_mode = tk.StringVar(value="Estrito")
         self.config_path = Path(__file__).resolve().parents[3] / ".sdhq-desktop.json"
-        self.root.title(f"School Days HQ · Modding Toolkit {__version__}")
+        self.root.title(f"School Days HQ / Shiny Days · Modding Toolkit {__version__}")
         self.root.geometry("1380x900")
         self.root.minsize(1060, 720)
         style = ttk.Style()
@@ -53,8 +53,8 @@ class Application:
         style.configure("Subtitle.TLabel", foreground="#526579")
         shell = ttk.Frame(root, padding=16)
         shell.pack(fill="both", expand=True)
-        ttk.Label(shell, text="School Days HQ", style="Title.TLabel").pack(anchor="w")
-        ttk.Label(shell, text="MODDING TOOLKIT  /  v0.11  /  Instalação alvo: v1.02", style="Subtitle.TLabel").pack(anchor="w", pady=(0, 12))
+        ttk.Label(shell, text="School Days HQ / Shiny Days", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(shell, text=f"MODDING TOOLKIT  /  {__version__}  /  SDHQ v1.02 + Shiny Days 1.01e", style="Subtitle.TLabel").pack(anchor="w", pady=(0, 12))
         self.tabs = ttk.Notebook(shell)
         self.tabs.pack(fill="both", expand=True)
         self.config_tab = ttk.Frame(self.tabs, padding=14)
@@ -70,7 +70,7 @@ class Application:
             defaults.update(json.loads(self.config_path.read_text(encoding="utf-8")))
         except (OSError, ValueError):
             pass
-        for index, (key, label) in enumerate((("game", "Instalação do jogo v1.02"), ("packs", "Packs originais"), ("workspace", "Workspace de edição"), ("reports", "Logs e relatórios"), ("output", "Saída de GPKs e pacotes"))):
+        for index, (key, label) in enumerate((("game", "Instalação do jogo"), ("packs", "Packs originais"), ("workspace", "Workspace de edição"), ("reports", "Logs e relatórios"), ("output", "Saída de GPKs e pacotes"))):
             variable = tk.StringVar(value=defaults[key])
             self.paths[key] = variable
             ttk.Label(self.config_tab, text=label).grid(row=index, column=0, sticky="w", padx=(0, 15), pady=10)
