@@ -57,7 +57,7 @@ def check_reference(metadata, report):
         raise mismatch("As entradas do metadata não correspondem ao índice atual.")
 
 
-def extract_selection(archive: Path, destination: Path, key: bytes, paths=None,
+def extract_selection(archive: Path, destination: Path, key: bytes | None, paths=None,
                       *, restore=False, progress=None, cancel=None):
     report = read_stack_index(archive, key)
     entries = report["entries"]
