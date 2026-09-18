@@ -10,7 +10,7 @@ def repack_archive(
     source_directory: Path,
     reference: Path,
     output_dir: Path,
-    key: bytes,
+    key: bytes | None,
     *,
     progress: Callable[[int, int, str, bool], None] | None = None,
     cancel=None,
