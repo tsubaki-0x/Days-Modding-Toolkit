@@ -85,7 +85,7 @@ class Settings:
 
     def validate(self):
         if not self.game.is_dir() or not self.packs.is_dir():
-            raise ValueError("Selecione uma instalação v1.02 e uma pasta Packs existentes")
+            raise ValueError("Selecione uma instalação compatível e uma pasta Packs existentes")
         writable = [self.workspace.resolve(), self.reports.resolve(), self.output.resolve()]
         packs = self.packs.resolve()
         for path in writable:
@@ -126,12 +126,13 @@ class DesktopService:
         return self.indexes[name]
 
     def detect(self, *, cancel, progress):
-        progress(0, 1, "Localizando a chave da instalação…")
+        progress(0, 1, "Localizando CIPHERCODE/PIDX; fallback por GPK ativado…")
         if self.key is None:
             result = find_ciphercode(self.settings.game)
-            if not result["found"]:
-                raise ValueError("CIPHERCODE não encontrado nos executáveis da instalação")
-            self.key = bytes.fromhex(result["key_hex"])
+            if result["found"]:
+                self.key = bytes.fromhex(result["key_hex"])
+            else:
+                progress(0, 1, "CIPHERCODE não encontrado; autodetectando a chave em cada GPK…")
         archives = sorted((p for p in self.settings.packs.iterdir() if p.is_file() and p.suffix.lower() == ".gpk"), key=lambda p: p.name.lower())
         if not archives:
             raise ValueError("Nenhum GPK encontrado em Packs")
