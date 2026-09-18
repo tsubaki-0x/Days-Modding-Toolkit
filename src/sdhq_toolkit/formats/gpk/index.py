@@ -11,6 +11,25 @@ from ...utils.binary import read_suffix
 from ...utils.paths import safe_member_path
 
 
+# Known repeating XOR keys used by the Stack PIDX variants confirmed by this
+# project. A caller-supplied/CIPHERCODE key is always tried first; these values
+# are fallbacks so an archive can identify itself by successfully decoding.
+KNOWN_INDEX_KEYS: tuple[tuple[str, bytes], ...] = (
+    (
+        "SCHOOL_DAYS_HQ",
+        bytes.fromhex("82 EE 1D B3 57 E9 2C C2 2F 54 7B 10 4C 9A 75 49"),
+    ),
+    (
+        "ALT_56",
+        bytes.fromhex("56 7C 1B 90 B6 FE 3F DB B6 06 79 EA CC 11 A0 4F"),
+    ),
+    (
+        "SHINY_DAYS",
+        bytes.fromhex("F0 D0 BC 05 54 AC 68 A9 F1 7C 8E 3D 64 0B F3 AA"),
+    ),
+)
+
+
 @dataclass(slots=True)
 class StackIndexEntry:
     path: str
@@ -27,7 +46,7 @@ class StackIndexEntry:
 
 def xor_with_repeating_key(data: bytes, key: bytes) -> bytes:
     if not key:
-        raise ValueError("CIPHERCODE key is empty")
+        raise ValueError("CIPHERCODE/PIDX key is empty")
     return bytes(value ^ key[index % len(key)] for index, value in enumerate(data))
 
 
@@ -84,7 +103,81 @@ def parse_decompressed_index(data: bytes, archive_size: int) -> list[StackIndexE
     return entries
 
 
-def read_stack_index(archive: Path, key: bytes) -> dict:
+def _key_name(key: bytes | None) -> str:
+    if key is None:
+        return "NO_XOR"
+    for name, known in KNOWN_INDEX_KEYS:
+        if key == known:
+            return name
+    return "SUPPLIED"
+
+
+def _candidate_keys(key: bytes | None):
+    candidates: list[tuple[str, bytes | None]] = []
+    seen: set[bytes | None] = set()
+
+    if key is not None:
+        candidates.append((_key_name(key), key))
+        seen.add(key)
+
+    for name, known in KNOWN_INDEX_KEYS:
+        if known not in seen:
+            candidates.append((name, known))
+            seen.add(known)
+
+    # Kept as a final compatibility probe. Confirmed game archives currently
+    # use XOR, but accepting a plain PIDX costs nothing and keeps the parser
+    # defensive for related Stack archives.
+    candidates.append(("NO_XOR", None))
+    return candidates
+
+
+def _decode_stack_index(
+    encrypted_index: bytes,
+    archive_size: int,
+    preferred_key: bytes | None,
+) -> tuple[list[StackIndexEntry], bytes, bytes, str, bytes | None]:
+    failures: list[str] = []
+
+    for key_name, candidate in _candidate_keys(preferred_key):
+        transformed = (
+            encrypted_index
+            if candidate is None
+            else xor_with_repeating_key(encrypted_index, candidate)
+        )
+        if len(transformed) < 5:
+            failures.append(f"{key_name}: decoded PIDX is too short")
+            continue
+
+        declared_size = struct.unpack("<I", transformed[:4])[0]
+        try:
+            decompressed = zlib.decompress(transformed[4:])
+        except zlib.error:
+            failures.append(f"{key_name}: zlib rejected the PIDX")
+            continue
+
+        if len(decompressed) != declared_size:
+            failures.append(
+                f"{key_name}: PIDX size {len(decompressed)} != declared {declared_size}"
+            )
+            continue
+
+        try:
+            entries, trailer = _parse_decompressed_index(decompressed, archive_size)
+        except (ValueError, UnicodeError, struct.error) as exc:
+            failures.append(f"{key_name}: invalid index structure ({exc})")
+            continue
+
+        return entries, trailer, transformed[:4], key_name, candidate
+
+    raise ValueError(
+        "Index decryption/decompression failed for the supplied key and all "
+        "known School Days HQ / Shiny Days PIDX variants.\n  "
+        + "\n  ".join(failures)
+    )
+
+
+def read_stack_index(archive: Path, key: bytes | None = None) -> dict:
     archive = archive.resolve()
     archive_size = archive.stat().st_size
     footer = read_suffix(archive, FOOTER_SIZE)
@@ -100,25 +193,25 @@ def read_stack_index(archive: Path, key: bytes) -> dict:
     if len(encrypted_index) != index_size:
         raise ValueError("Could not read the complete encrypted index")
 
-    decrypted = xor_with_repeating_key(encrypted_index, key)
-    if len(decrypted) < 5:
-        raise ValueError("Decrypted index is too short")
-    try:
-        decompressed = zlib.decompress(decrypted[4:])
-    except zlib.error as exc:
-        raise ValueError("Index decryption or Zlib decompression failed; check CIPHERCODE") from exc
-
-    entries, trailer = _parse_decompressed_index(decompressed, archive_size)
+    entries, trailer, prefix, key_name, effective_key = _decode_stack_index(
+        encrypted_index,
+        archive_size,
+        key,
+    )
     return {
         "archive": str(archive),
         "format": "GPK/STACK",
         "archive_size": archive_size,
         "index_size": index_size,
         "index_offset": index_offset,
-        "decompressed_index_size": len(decompressed),
-        "index_prefix_hex": decrypted[:4].hex().upper(),
-        "index_prefix_uint32": struct.unpack("<I", decrypted[:4])[0],
+        "decompressed_index_size": struct.unpack("<I", prefix)[0],
+        "index_prefix_hex": prefix.hex().upper(),
+        "index_prefix_uint32": struct.unpack("<I", prefix)[0],
         "index_trailer_hex": trailer.hex().upper(),
+        "index_key_name": key_name,
+        "index_key_hex": effective_key.hex().upper() if effective_key else "",
+        "index_xor": effective_key is not None,
+        "index_codec": "zlib",
         "entry_count": len(entries),
         "packed_entries": sum(entry.is_packed for entry in entries),
         "unpacked_entries": sum(not entry.is_packed for entry in entries),
@@ -129,11 +222,11 @@ def read_stack_index(archive: Path, key: bytes) -> dict:
 def load_key_report(path: Path) -> bytes:
     report = json.loads(path.read_text(encoding="utf-8"))
     if not report.get("found") or not report.get("key_hex"):
-        raise ValueError("CIPHERCODE was not found in the supplied report")
+        raise ValueError("CIPHERCODE/PIDX key was not found in the supplied report")
     try:
         return bytes.fromhex(report["key_hex"])
     except ValueError as exc:
-        raise ValueError("Invalid key_hex in CIPHERCODE report") from exc
+        raise ValueError("Invalid key_hex in CIPHERCODE/PIDX report") from exc
 
 
 def save_index_report(report: dict, output: Path) -> None:
