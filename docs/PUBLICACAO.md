@@ -1,28 +1,48 @@
-# Preparar o repositório e a release
+# Publicação do Days ModToolkit
 
-## Nome público
+## Distribuição
 
-O projeto passa a usar **Days ModToolkit** como identidade pública.
+O projeto **não utiliza GitHub Releases**.
 
-Nome recomendado do repositório:
+A distribuição pública é feita diretamente pela branch principal:
 
 ```text
-Days-ModToolkit
+days-modtoolkit
+```
+
+O usuário baixa o estado atual pelo botão:
+
+```text
+Code → Download ZIP
+```
+
+Assim, o conteúdo da branch principal é a própria distribuição do toolkit.
+
+## Nome do repositório
+
+Identidade pública atual:
+
+```text
+Days-Modding-Toolkit
+```
+
+Nome do projeto exibido na documentação e na GUI:
+
+```text
+Days ModToolkit
 ```
 
 O namespace Python histórico `sdhq_toolkit` e os entry points `sdhq`/`sdhq-gui` permanecem por compatibilidade.
 
-## Arquivos para o GitHub
+## O que deve existir na branch principal
 
 Mantenha:
 
 - `README.md`
-- `RELEASES.md`
 - `LICENSE`
 - `pyproject.toml`
 - `.gitignore`
-- launchers
-- `tema.example.json`
+- launchers `.bat`
 - `themes/school_days/`
 - `themes/shiny_days/`
 - `src/`
@@ -30,25 +50,36 @@ Mantenha:
 - `pipelines/`
 - `tests/`
 
-Não envie `__pycache__`, `.pyc`, GPKs ou dados pessoais de workspace.
+Os perfis oficiais de tema devem acompanhar a branch principal para que o ZIP baixado por **Code → Download ZIP** funcione imediatamente.
 
-## Dados locais
+## Não publicar
 
-Não publicar:
+Não versionar:
 
 - `.sdhq-repack.json`
 - `.sdhq-desktop.json`
-- overrides pessoais `tema.json`/`Fundo.png` da raiz;
-- GPKs;
+- overrides pessoais `tema.json`/`Fundo.png` na raiz;
+- GPKs originais;
 - mods pessoais;
-- workspace;
+- workspaces;
 - backups;
-- relatórios ou outputs locais.
+- relatórios e outputs locais;
+- `__pycache__`;
+- arquivos `.pyc`.
 
-## Pacote da release
+## Atualizações
 
-A linha atual é **v0.13.0-dev1**.
+Novas versões são publicadas atualizando a própria branch `days-modtoolkit`.
 
-Monte um ZIP completo a partir dos arquivos públicos e teste em uma pasta nova antes de publicar. Os perfis oficiais em `themes/school_days/` e `themes/shiny_days/` devem acompanhar a distribuição.
+O número da versão continua registrado no código e no README para diagnóstico, mas não é necessário criar uma Release ou anexar ZIP manualmente.
 
-Pillow continua opcional para a arte lateral, mas é recomendado para recorte e escala de melhor qualidade.
+Antes de atualizar a branch principal:
+
+1. valide a GUI;
+2. valide a autodetecção School Days HQ/Shiny Days;
+3. teste o repack;
+4. confira os assets dos temas;
+5. execute a suíte de testes aplicável;
+6. só então atualize `days-modtoolkit`.
+
+O botão **Code → Download ZIP** passa automaticamente a entregar esse novo estado.
