@@ -1,4 +1,4 @@
-<img width="1672" height="941" alt="School Days" src="https://github.com/user-attachments/assets/f372b6c5-15a3-4e64-ba90-8981ff755cd6" />
+<img width="1672" height="941" alt="SUZU 2" src="https://github.com/user-attachments/assets/506c5880-8ab9-47f7-8d74-1d629e71b796" />
 
 # School Days HQ / Shiny Days Modding Toolkit
 
