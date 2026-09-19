@@ -1,0 +1,21 @@
+{
+  "id": "school_days",
+  "nome": "School Days HQ",
+  "index_keys": ["SCHOOL_DAYS_HQ"],
+  "logo": "Logo.png",
+  "imagem": "Fundo.png",
+  "opacidade": 1.0,
+  "zoom": 1.0,
+  "x": 50,
+  "y": 0,
+  "cabecalho": "HQ  /  MODDING TOOLKIT",
+  "subtitulo": "SCHOOL DAYS HQ  ·  {version}",
+  "cores": {
+    "sky": "#5FA8E8",
+    "light": "#A9D7F5",
+    "white": "#F7F7F2",
+    "navy": "#17283B",
+    "ink": "#101820",
+    "red": "#C9363E"
+  }
+}
