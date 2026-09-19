@@ -23,7 +23,7 @@ Ela foi encontrada em `SHINYDAYS.exe` e validada contra um PIDX real:
 
 ## Como o toolkit usa isso
 
-Não é necessário escolher "Shiny Days" manualmente.
+Não é necessário escolher Shiny Days manualmente.
 
 `read_stack_index()` tenta a chave fornecida primeiro e, se necessário, as variantes conhecidas de School Days HQ, ALT_56 e Shiny Days.
 
@@ -31,7 +31,11 @@ O writer usa a chave efetivamente detectada no GPK de referência.
 
 ## Patch 1.01e
 
-Segundo as notas fornecidas pela JAST, o patch corrige:
+Página oficial:
+
+https://help.jastusa.com/en/knowledgebase/article/shiny-days-patch-1-01e-and-bugfixes
+
+Segundo as notas da JAST, o patch corrige:
 
 - ending de Minami, incluindo novos créditos e crash;
 - nós do Route Map e percentual;
@@ -40,10 +44,18 @@ Segundo as notas fornecidas pela JAST, o patch corrige:
 - uniforme na rota da Inori;
 - pequenos erros de texto.
 
-O problema de save não é resolvido pelo patch. As orientações da JAST são executar como Administrador ou ajustar as permissões da pasta de instalação.
+O problema geral de save não é resolvido pelo patch e pode depender das permissões da pasta de instalação.
 
 ## Escopo atual
 
 A camada GPK/STACK está suportada.
 
 Isso não significa que todos os formatos internos exclusivos de Shiny Days já tenham validadores especializados. Para formatos desconhecidos, use o modo Experimental com cautela e teste no jogo.
+
+## Tema automático da GUI
+
+Na linha v0.13, a identificação `SHINY_DAYS` também controla a apresentação visual: ao selecionar um GPK reconhecido como Shiny Days, a GUI troca automaticamente logo, arte lateral, paleta, cabeçalho e título.
+
+A arte usa `opacidade: 1.0`, sem esmaecimento. A paleta usa laranja/amarelo/creme inspirados na identidade visual do jogo.
+
+Essa troca é somente visual; a detecção e o repack continuam usando o GPK como autoridade técnica.
