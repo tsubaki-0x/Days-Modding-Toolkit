@@ -1,112 +1,142 @@
-<img width="1672" height="941" alt="School Days" src="https://github.com/user-attachments/assets/f372b6c5-15a3-4e64-ba90-8981ff755cd6" />
+<img width="1672" height="941" alt="Days ModToolkit" src="https://github.com/user-attachments/assets/f372b6c5-15a3-4e64-ba90-8981ff755cd6" />
 
-# School Days HQ / Shiny Days Modding Toolkit
+# Days ModToolkit
 
-Toolkit não oficial para explorar, validar e reconstruir arquivos **GPK/STACK** da família Days, com foco atual em:
+Toolkit não oficial para explorar, validar e reconstruir arquivos **GPK/STACK** da série *Days*, com suporte atual a:
 
 - **School Days HQ v1.02**
-- **Shiny Days 1.01e** (baseline usado no desenvolvimento)
+- **Shiny Days 1.01e** — baseline usado no desenvolvimento
 
-**GARbro explora e extrai. Você edita. O ModToolkit faz o repack.**
+> **GARbro explora e extrai. Você edita. O Days ModToolkit faz o repack.**
 
-Versão atual: **0.12.0-dev**.
+Linha de desenvolvimento atual: **v0.13.0-dev1**.
 
-> O repositório continua com o nome histórico `SchoolDaysHQ-Modding-Toolkit`, mas o núcleo GPK agora suporta as variantes confirmadas de School Days HQ e Shiny Days.
+O projeto nasceu como *School Days HQ Modding Toolkit* e evoluiu para um toolkit multi-game. O namespace Python `sdhq_toolkit` e alguns nomes de CLI continuam preservados por compatibilidade com versões anteriores.
 
-## O que mudou na v0.12
+## Destaques
 
-O toolkit não depende mais de uma única chave global de PIDX.
+- leitura e reconstrução de GPK/STACK;
+- autodetecção da variante/chave PIDX por arquivo;
+- repack preservando a chave efetivamente detectada no GPK de referência;
+- fluxo principal baseado em **GARbro + pasta editada + GPK original**;
+- validações preventivas antes de publicar a saída;
+- suporte a workspaces, relatórios e pacotes `.sdmod`;
+- ferramentas para CMAP, ORS, PNG, OGG e outros assets já exercitados no projeto;
+- interface gráfica com perfis visuais por jogo;
+- **tema automático**: ao selecionar um GPK reconhecido, a GUI acompanha o jogo detectado sem alterar a lógica do parser/repack.
 
-Agora ele:
+## Jogos suportados
 
-- tenta primeiro a chave fornecida ou extraída por `CIPHERCODE`;
-- se ela falhar, autodetecta variantes conhecidas do PIDX por arquivo;
-- reconhece a chave de School Days HQ;
-- reconhece a chave de Shiny Days;
-- preserva no repack a mesma chave que realmente abriu o GPK de referência;
-- permite usar o fluxo principal GARbro + pasta externa sem informar manualmente uma chave;
-- torna `--key-report` opcional na CLI;
-- mantém o fluxo legado, workspaces e pacotes `.sdmod`.
+### School Days HQ
 
-### Chaves confirmadas
+Baseline principal do projeto:
 
-School Days HQ:
+- **v1.02**
+- 29 GPKs catalogados durante o desenvolvimento;
+- 69.936 entradas no baseline consolidado;
+- testes realizados ao longo do projeto com INI, ORS, CMAP, PNG, OGG e WMV;
+- tema visual padrão da GUI.
+
+### Shiny Days
+
+Baseline técnico:
+
+- **Shiny Days 1.01e**
+- patch oficial JAST 1.01e aplicado antes da extração/repack;
+- PIDX de Shiny Days reconhecido por autodetecção;
+- repack preservando a chave do próprio arquivo de referência;
+- mesmo fluxo GARbro/pasta externa usado em School Days HQ;
+- tema próprio de Shiny Days na linha v0.13.
+
+O suporte ao **container GPK/STACK** está implementado. Isso não significa que todo formato interno exclusivo de Shiny Days possua um validador especializado; o teste final no jogo continua obrigatório.
+
+## Chaves PIDX confirmadas
+
+**School Days HQ**
 
 ```text
 82 EE 1D B3 57 E9 2C C2 2F 54 7B 10 4C 9A 75 49
 ```
 
-Shiny Days:
+**Shiny Days**
 
 ```text
 F0 D0 BC 05 54 AC 68 A9 F1 7C 8E 3D 64 0B F3 AA
 ```
 
-Também permanece reconhecida a variante compatível:
+Variante adicional conhecida:
 
 ```text
 56 7C 1B 90 B6 FE 3F DB B6 06 79 EA CC 11 A0 4F
 ```
 
-A chave do Shiny Days foi confirmada ao decodificar um PIDX real com zlib válido e também encontrada literalmente em `SHINYDAYS.exe`.
+Uma chave só é aceita quando o PIDX resultante passa pelas verificações estruturais do toolkit.
 
-## Status por jogo
+## Temas automáticos da GUI
 
-### School Days HQ
+A linha v0.13 separa a apresentação da lógica técnica.
 
-Baseline principal já amplamente exercitado pelo projeto:
+```text
+GPK selecionado
+      ↓
+leitura do PIDX
+      ↓
+index_key_name
+   ↙       ↘
+School    Shiny
+Days HQ   Days
+   ↓       ↓
+tema      tema
+```
 
-- versão: **v1.02**
-- histórico: 29 GPKs
-- 69.936 entradas catalogadas
-- alterações INI, ORS, CMAP, PNG, OGG e WMV testadas ao longo do desenvolvimento
+Mapeamento atual:
 
-### Shiny Days
+```text
+SCHOOL_DAYS_HQ -> tema School Days HQ
+SHINY_DAYS     -> tema Shiny Days
+```
 
-Baseline técnico atual:
+A troca pode alterar:
 
-- versão usada: **Shiny Days com patch oficial JAST 1.01e aplicado**
-- PIDX de Shiny Days suportado por autodetecção
-- repack preserva a chave Shiny do arquivo de referência
-- mesmo fluxo de GARbro/pasta externa pode ser usado
+- logo;
+- arte lateral;
+- paleta;
+- cores de seleção e progresso;
+- cabeçalho;
+- título da janela.
 
-O suporte ao **container GPK** está implementado. Isso não significa que todo formato de asset interno específico de Shiny Days já foi testado individualmente; o teste final no jogo continua obrigatório.
+Ela **não** altera a chave, codec, flags, offsets ou writer. O GPK continua sendo a autoridade técnica.
+
+Mais detalhes: [docs/TEMAS_GUI.md](docs/TEMAS_GUI.md).
 
 ## Requisitos
 
 - Windows
 - Python **3.10+** com Tkinter/Tcl-Tk
-- School Days HQ v1.02 ou Shiny Days 1.01e
 - [GARbro](https://github.com/morkt/GARbro) para exploração/extração
-- Pillow opcional para a arte lateral:
+- Pillow recomendado para recorte/redimensionamento da arte lateral:
 
 ```powershell
 python -m pip install Pillow
 ```
 
-O jogo, GARbro e arquivos proprietários não acompanham o toolkit.
+O jogo, GARbro, GPKs originais e outros assets proprietários não acompanham o toolkit.
 
 ## Fluxo principal
 
-1. Abra o GPK no GARbro.
-2. Extraia os arquivos desejados preservando os caminhos internos.
-3. Edite em ferramentas externas.
+1. Abra o GPK desejado no GARbro.
+2. Extraia os arquivos preservando os caminhos internos.
+3. Edite os assets em ferramentas externas.
 4. Abra `run_gui.bat`.
 5. Selecione o **GPK de referência**.
-6. Selecione a **pasta com as alterações**.
-7. A instalação do jogo é opcional no fluxo principal; quando informada, o toolkit tenta extrair a chave dela primeiro.
+6. A GUI lê o índice e identifica a variante suportada.
+7. Selecione a **pasta com as alterações**.
 8. Clique em **Conferir alterações**.
-9. Clique em **Gerar GPK**.
+9. Revise as substituições detectadas.
+10. Clique em **Gerar GPK**.
+11. Faça backup do GPK instalado e teste o resultado no jogo.
 
-O GPK de referência é a autoridade para:
-
-- nomes;
-- ordem;
-- offsets/base estrutural;
-- flags;
-- headers;
-- campos desconhecidos;
-- proteção do PIDX.
+O GPK de referência é a autoridade para nomes, ordem, flags, headers, campos desconhecidos, estrutura e proteção do PIDX.
 
 ## Autodetecção de PIDX
 
@@ -116,22 +146,15 @@ O núcleo usa:
 read_stack_index(archive, key=None)
 ```
 
-A ordem de tentativa é:
+A ordem de tentativa inclui:
 
-1. chave fornecida/CIPHERCODE, se houver;
+1. chave fornecida/CIPHERCODE, quando existir;
 2. School Days HQ;
 3. variante ALT_56;
 4. Shiny Days;
 5. PIDX sem XOR como fallback defensivo.
 
-Uma variante só é aceita se:
-
-- o zlib descompactar;
-- o tamanho declarado conferir;
-- o índice tiver estrutura válida;
-- as entradas puderem ser interpretadas com segurança.
-
-O relatório do índice registra:
+O relatório registra:
 
 ```text
 index_key_name
@@ -144,90 +167,72 @@ index_codec
 
 O writer:
 
-- lê novamente o GPK de referência;
-- detecta a chave efetiva daquele arquivo;
+- relê o GPK de referência;
+- identifica a chave efetiva;
 - preserva entradas não alteradas;
 - recompõe apenas entradas modificadas;
 - recria o PIDX;
-- usa a **mesma chave efetiva da referência**;
+- reutiliza a proteção correspondente ao arquivo de referência;
 - valida o arquivo temporário antes de publicar a saída.
 
 Assim, um GPK de Shiny Days não é convertido acidentalmente para a chave de School Days HQ.
 
 ## CLI
 
-`--key-report` agora é opcional nos comandos GPK principais.
-
-Exemplo:
+Os comandos continuam disponíveis pelo namespace histórico para compatibilidade:
 
 ```powershell
 python -m sdhq_toolkit.cli read-index "D:\Shiny Days\Packs\Script.GPK"
 ```
 
-ou, usando um relatório explícito:
+`--key-report` é opcional nos fluxos GPK atuais.
 
-```powershell
-python -m sdhq_toolkit.cli read-index "D:\Jogo\Packs\Script.GPK" --key-report reports\ciphercode_report.json
-```
+## Shiny Days 1.01e
 
-A extração de chave também foi ampliada: se o recurso nomeado `CIPHERCODE` não existir, o toolkit procura as chaves conhecidas diretamente nos executáveis.
+Para reproduzir o baseline usado pelo projeto, aplique primeiro o patch oficial **1.01e** da JAST e só então utilize os GPKs como referência.
 
-## Limites atuais
+Página oficial:
+
+https://help.jastusa.com/en/knowledgebase/article/shiny-days-patch-1-01e-and-bugfixes
+
+O patch corrige, entre outros itens, o final da Minami, Route Map, splash screens, Story Route/Kokoro Bad End, uniforme da rota da Inori e pequenos erros de texto.
+
+## Limitações atuais
 
 - inclusão de novas entradas no índice ainda não é suportada;
 - remoção e renomeação de entradas ainda não são suportadas;
 - arquivo ausente na pasta externa mantém a entrada da referência;
 - arquivos novos aparecem como **novo — não incluído**;
 - validações de assets são preventivas e não substituem teste real;
-- compatibilidade do container não implica compatibilidade semântica de todo asset interno;
-- não misture GPKs de versões diferentes como referência/extração.
-
-## Shiny Days 1.01e
-
-Para o baseline usado neste projeto, aplique primeiro o patch oficial 1.01e da JAST e só então use os GPKs como referência.
-
-Esse patch corrige, entre outros pontos:
-
-- ending de Minami e crash relacionado;
-- nós/percentual do Route Map;
-- splash screens ausentes;
-- Story Route do Kokoro Bad End;
-- uniforme incorreto na rota da Inori;
-- pequenos erros de texto.
-
-As próprias notas da JAST informam que o problema de save não é corrigido por esse patch e pode exigir execução como Administrador ou ajuste de permissões da pasta.
+- compatibilidade do container não garante compatibilidade semântica de todo asset interno;
+- não misture GPKs de versões diferentes como referência e origem da edição.
 
 ## Testes
-
-A suíte existente continua disponível:
 
 ```powershell
 $env:PYTHONPATH = "src"
 python -m unittest discover -s tests -q
 ```
 
-A v0.12 adiciona testes sintéticos específicos para:
-
-- autodetecção School Days HQ;
-- autodetecção Shiny Days;
-- fallback quando uma chave errada é fornecida;
-- repack Shiny preservando a chave Shiny;
-- fluxo principal sem diretório do jogo;
-- descoberta literal da chave no executável.
+A linha v0.13 inclui testes específicos para autodetecção multi-game, preservação de chave no repack, seleção automática de tema e regressões da GUI.
 
 ## Documentação
 
 - [GARbro + repack](docs/GARBRO_REPACK.md)
 - [Formato GPK](docs/GPK_FORMAT.md)
-- [Suporte a Shiny Days](docs/SHINY_DAYS.md)
+- [Shiny Days](docs/SHINY_DAYS.md)
+- [Temas da GUI](docs/TEMAS_GUI.md)
+- [Notas v0.13](docs/RELEASE_v0.13.md)
+- [Notas v0.12](docs/RELEASE_v0.12.md)
 - [Interface anterior e .sdmod](docs/DESKTOP.md)
 - [Workspaces parciais](docs/PARTIAL_WORKSPACES.md)
-- [Notas v0.12](docs/RELEASE_v0.12.md)
 
 ## Licença e créditos
 
 Código sob [MIT](LICENSE).
 
+**SUZU / tsubaki-0x** — direção do projeto, testes, documentação e desenvolvimento do toolchain.
+
 School Days, Shiny Days, logos, executáveis e assets pertencem aos respectivos titulares e não são cobertos pela licença MIT deste repositório.
 
-Projeto não oficial, sem vínculo com os titulares das franquias ou com o GARbro.
+Projeto independente e não oficial, sem vínculo com 0verflow, JAST USA ou GARbro.
