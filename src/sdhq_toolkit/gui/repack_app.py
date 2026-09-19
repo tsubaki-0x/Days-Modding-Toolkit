@@ -9,9 +9,13 @@ from tkinter import ttk, filedialog, messagebox
 
 from .. import __version__
 from ..core.folder_repack import FolderRepackService
+from ..formats.gpk.index import read_stack_index
 from .controller import JobController
 from .repack_controller import RepackSettings, garbro_status, launch_garbro
-from .theme import apply_theme, add_header, WHITE, NAVY, LIGHT
+from .theme import (
+    DEFAULT_THEME_ID, apply_theme, add_header, load_theme_profile, palette,
+    theme_for_index_key, update_header,
+)
 from .background import ArtworkPanel
 from .scroll_form import ScrollForm
 
@@ -22,15 +26,19 @@ class RepackApplication:
         root.title(f'Days ModToolkit {__version__} — School Days HQ / Shiny Days')
         root.geometry(f'{min(1460, root.winfo_screenwidth() - 60)}x{min(900, root.winfo_screenheight() - 100)}')
         root.minsize(760, 540)
-        self.style = apply_theme(root)
+        self.theme_id = DEFAULT_THEME_ID
+        self.theme_profile = load_theme_profile(self.theme_id)
+        self.style = apply_theme(root, self.theme_profile)
+        self._theme_after = None
+        self._reference_theme_stamp = None
         self.settings = RepackSettings(Path.cwd() / '.sdhq-repack.json')
         self.jobs = JobController()
         self.closing = False
         self.last_report = None
         self.controls = []
-        self.artwork = ArtworkPanel(root)
+        self.artwork = ArtworkPanel(root, self.theme_id)
         self.artwork.pack(side='right', fill='y', padx=(0, 12), pady=12)
-        # Keep the tested content width when the user shrinks the window.
+
         def arrange_artwork(event):
             if event.widget is root:
                 visible = event.width >= 1280
@@ -38,19 +46,21 @@ class RepackApplication:
                     self.artwork.pack(side='right', fill='y', padx=(0, 12), pady=12, before=shell)
                 elif not visible and self.artwork.winfo_manager():
                     self.artwork.pack_forget()
+
         root.bind('<Configure>', arrange_artwork, add='+')
         shell = ttk.Frame(root, padding=8)
         shell.pack(fill='both', expand=True, padx=12, pady=12)
         self.panes = ttk.Panedwindow(shell, orient='vertical')
         self.panes.pack(fill='both', expand=True)
         self.form = ScrollForm(self.panes)
+        self.form.set_background(palette(self.theme_profile)['navy'])
         self.panes.add(self.form, weight=1)
         frame = self.form.body
         results = ttk.Frame(self.panes, padding=8)
         self.panes.add(results, weight=1)
         results.columnconfigure(0, weight=1)
         results.rowconfigure(0, weight=1)
-        self.header = add_header(frame, __version__)
+        self.header = add_header(frame, __version__, self.theme_profile)
         ttk.Label(frame, text='School Days HQ / Shiny Days — extraia no GARbro, edite e monte aqui.', font=('Segoe UI', 12, 'bold')).pack(anchor='w')
         ttk.Label(frame, text='Use uma pasta exclusiva por GPK, preservando os caminhos internos e os formatos.', wraplength=880).pack(anchor='w', pady=(4, 12))
         fields = ttk.LabelFrame(frame, text='  01  /  Localizações  ', padding=10)
@@ -71,6 +81,7 @@ class RepackApplication:
         self.garbro_label = tk.StringVar(value='Não configurado')
         ttk.Label(frame, textvariable=self.garbro_label).pack(anchor='w', pady=5)
         self.values['garbro'].trace_add('write', lambda *_: self.garbro_label.set(garbro_status(self.values['garbro'].get())))
+        self.values['reference'].trace_add('write', self._schedule_reference_theme_detection)
         toolbar = ttk.Frame(frame)
         toolbar.pack(fill='x', pady=8)
         for index, (label, callback) in enumerate([('Abrir GARbro', self.open_garbro), ('Conferir alterações', lambda: self.start(False)),
@@ -101,9 +112,11 @@ class RepackApplication:
         scroll.grid(row=0, column=1, sticky='ns')
         horizontal.grid(row=1, column=0, sticky='ew')
         self.table.grid(row=0, column=0, sticky='nsew')
+        colors = palette(self.theme_profile)
         self.detail = tk.Text(results, height=2, wrap='word', state='disabled',
-                              background=NAVY, foreground=WHITE, selectbackground=LIGHT, selectforeground=NAVY, relief='flat',
-                              highlightthickness=1, highlightbackground=LIGHT, padx=8, pady=6)
+                              background=colors['navy'], foreground=colors['white'],
+                              selectbackground=colors['light'], selectforeground=colors['ink'], relief='flat',
+                              highlightthickness=1, highlightbackground=colors['light'], padx=8, pady=6)
         self.detail.grid(row=1, column=0, sticky='ew', pady=(8, 0))
         self.table.bind('<<TreeviewSelect>>', self.show_detail)
         ttk.Label(frame, text='Avisos não bloqueiam a montagem; funcionamento no jogo não garantido.\nAntes de trocar o GPK em Packs, feche o jogo e o GARbro e guarde uma cópia do GPK anterior.', wraplength=1000).pack(anchor='w', pady=5)
@@ -112,6 +125,61 @@ class RepackApplication:
         root.report_callback_exception = lambda kind, error, trace: self.error(error)
         root.protocol('WM_DELETE_WINDOW', self.close)
         root.after(100, self.poll)
+
+    def apply_game_theme(self, theme_id, *, key_name=None, announce=False):
+        profile = load_theme_profile(theme_id, allow_root_override=(theme_id == DEFAULT_THEME_ID))
+        self.theme_id = profile['id']
+        self.theme_profile = profile
+        self.style = apply_theme(self.root, profile)
+        colors = palette(profile)
+        self.artwork.set_theme(self.theme_id)
+        self.form.set_background(colors['navy'])
+        update_header(self.header, __version__, profile)
+        self.detail.configure(
+            background=colors['navy'], foreground=colors['white'],
+            selectbackground=colors['light'], selectforeground=colors['ink'],
+            highlightbackground=colors['light'],
+        )
+        game_name = profile.get('nome', 'Days')
+        self.root.title(f'Days ModToolkit {__version__} — {game_name}')
+        if announce and hasattr(self, 'status'):
+            suffix = f' (chave {key_name})' if key_name else ''
+            self.status.set(f'GPK reconhecido: {game_name}{suffix}. Tema aplicado automaticamente.')
+
+    def _schedule_reference_theme_detection(self, *_):
+        if self._theme_after:
+            try:
+                self.root.after_cancel(self._theme_after)
+            except tk.TclError:
+                pass
+        self._theme_after = self.root.after(250, self._detect_reference_theme)
+
+    def _detect_reference_theme(self, announce=False):
+        self._theme_after = None
+        raw = self.values.get('reference').get().strip() if self.values.get('reference') else ''
+        if not raw:
+            return
+        path = Path(raw)
+        if not path.is_file() or path.suffix.lower() != '.gpk':
+            return
+        try:
+            stat = path.stat()
+            stamp = (str(path.resolve()), stat.st_size, stat.st_mtime_ns)
+            if self._reference_theme_stamp and self._reference_theme_stamp[:3] == stamp:
+                if announce:
+                    key_name = self._reference_theme_stamp[3]
+                    theme_id = theme_for_index_key(key_name)
+                    if theme_id:
+                        self.apply_game_theme(theme_id, key_name=key_name, announce=True)
+                return
+            report = read_stack_index(path)
+            key_name = report.get('index_key_name')
+            self._reference_theme_stamp = (*stamp, key_name)
+        except Exception:
+            return
+        theme_id = theme_for_index_key(key_name)
+        if theme_id:
+            self.apply_game_theme(theme_id, key_name=key_name, announce=announce)
 
     def guard(self, action):
         try:
@@ -127,6 +195,7 @@ class RepackApplication:
         saved = self.settings.load()
         for key, value in self.values.items():
             value.set(saved.get(key, str(Path.cwd() / key) if key in ('output', 'reports') else ''))
+        self.root.after(80, self._detect_reference_theme)
 
     def save(self):
         self.settings.save({key: value.get().strip() for key, value in self.values.items()})
@@ -139,6 +208,8 @@ class RepackApplication:
                 self.values[key].set(value)
                 self.save()
                 self.status.set('Localização salva: ' + value)
+                if key == 'reference':
+                    self._detect_reference_theme(announce=True)
             else:
                 self.status.set('Seleção cancelada; localização anterior mantida.')
         self.guard(action)
@@ -214,7 +285,6 @@ class RepackApplication:
                 self.cancel_button.state(['disabled'])
                 if status in ('PASS', 'WARN'):
                     self.table.delete(*self.table.get_children())
-                    # Missing entries are summarized, not rendered as thousands of table rows.
                     for row in result.get('files', []):
                         if row['state'] != 'manter referência' or row['warnings']:
                             self.table.insert('', 'end', values=(row['path'], row['state'], '\n'.join(row['warnings'])))
@@ -239,6 +309,12 @@ class RepackApplication:
 
     def close(self):
         self.guard(self.save)
+        if self._theme_after:
+            try:
+                self.root.after_cancel(self._theme_after)
+            except tk.TclError:
+                pass
+            self._theme_after = None
         self.closing = True
         if self.jobs.busy:
             self.cancel()
