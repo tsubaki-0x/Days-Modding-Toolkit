@@ -1,0 +1,21 @@
+{
+  "id": "shiny_days",
+  "nome": "Shiny Days",
+  "index_keys": ["SHINY_DAYS"],
+  "logo": "Logo.png",
+  "imagem": "Fundo.png",
+  "opacidade": 1.0,
+  "zoom": 1.0,
+  "x": 0,
+  "y": 0,
+  "cabecalho": "SHINY DAYS  /  MODDING TOOLKIT",
+  "subtitulo": "SHINY DAYS  ·  {version}",
+  "cores": {
+    "sky": "#FFB52B",
+    "light": "#FFD45A",
+    "white": "#FFF8E9",
+    "navy": "#382319",
+    "ink": "#24130A",
+    "red": "#F2611C"
+  }
+}
