@@ -1,4 +1,5 @@
-<img width="1672" height="941" alt="Days ModToolkit" src="https://github.com/user-attachments/assets/f372b6c5-15a3-4e64-ba90-8981ff755cd6" />
+<img width="1672" height="941" alt="SUZU 2" src="https://github.com/user-attachments/assets/1e6f485d-9b96-4b36-af37-3fcacfc5001e" />
+
 
 # Days ModToolkit
 
