@@ -22,7 +22,7 @@ Este projeto **não usa GitHub Releases**. A versão pública atual fica sempre 
 Para baixar sem usar Git:
 
 1. abra a página principal do repositório;
-2. confirme que a branch selecionada é **`days-modtoolkit`**;
+2. confirme que a branch selecionada é **`days-modtoolkit-v0.13`**;
 3. clique no botão verde **Code**;
 4. escolha **Download ZIP**;
 5. extraia o ZIP completamente para uma pasta;
