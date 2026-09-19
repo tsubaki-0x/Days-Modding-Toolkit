@@ -14,6 +14,25 @@ Linha de desenvolvimento atual: **v0.13.0-dev1**.
 
 O projeto nasceu como *School Days HQ Modding Toolkit* e evoluiu para um toolkit multi-game. O namespace Python `sdhq_toolkit` e alguns nomes de CLI continuam preservados por compatibilidade com versões anteriores.
 
+
+## Como baixar
+
+Este projeto **não usa GitHub Releases**. A versão pública atual fica sempre na branch principal **`days-modtoolkit`**.
+
+Para baixar sem usar Git:
+
+1. abra a página principal do repositório;
+2. confirme que a branch selecionada é **`days-modtoolkit`**;
+3. clique no botão verde **Code**;
+4. escolha **Download ZIP**;
+5. extraia o ZIP completamente para uma pasta;
+6. abra a pasta extraída;
+7. execute `run_gui.bat`.
+
+> Não execute o toolkit diretamente de dentro do arquivo ZIP. Extraia tudo primeiro para que `src/`, `themes/`, `docs/` e os demais arquivos permaneçam na estrutura esperada.
+
+Se você baixar novamente pelo botão **Code → Download ZIP**, receberá o estado mais recente da branch principal.
+
 ## Destaques
 
 - leitura e reconstrução de GPK/STACK;
