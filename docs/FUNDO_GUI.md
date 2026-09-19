@@ -1,21 +1,47 @@
-# Ajustar a arte da GUI
+# Arte e enquadramento da GUI
 
-Edite `tema.json`, na mesma pasta de `run_gui.bat`, e reabra a interface.
+A v0.13 possui temas separados em `themes/school_days/` e `themes/shiny_days/`. A arte ativa acompanha automaticamente o GPK de referência quando a chave PIDX é reconhecida.
 
-- `imagem`: nome de um PNG/JPG nessa pasta, ou caminho completo. Em caminhos
-  Windows use `/` ou `\\` em vez de uma única barra invertida.
-- `opacidade`: 0 esconde a arte, 1 mostra totalmente. Exemplo suave: 0.4.
-- `zoom`: 1 preenche o painel; 1.3 aproxima; 0.7 afasta. Limite: 0.2 a 3.
-- `x`: deslocamento em pixels; positivo move à direita, negativo à esquerda.
-- `y`: positivo move para baixo, negativo para cima.
+Campos de enquadramento em `tema.json`:
 
-Exemplo: `"x": -100, "y": 40` move a arte 100 pixels à esquerda e 40 abaixo.
-O recorte é centralizado antes dos deslocamentos. A imagem original não é alterada.
+- `imagem`: arquivo de arte relativo à pasta do tema;
+- `opacidade`: `1.0` = 100% opaco, sem esmaecimento;
+- `zoom`: escala adicional da imagem;
+- `x`: deslocamento horizontal em pixels;
+- `y`: deslocamento vertical em pixels.
 
-A arte ocupa o painel lateral direito, suavizada sobre branco; os controles
-permanecem sólidos para leitura. Em janelas com menos de 1280 pixels de largura,
-o painel é ocultado para preservar os campos. Amplie a janela para vê-lo.
+School Days HQ:
 
-Requer Pillow, já disponível no ambiente usado nesta entrega. Se necessário:
-`python -m pip install Pillow`. Sem a biblioteca ou a imagem, o repack continua
-funcionando. Não é necessário alterar os GPKs nem extrair a arte do jogo.
+```json
+{
+  "opacidade": 1.0,
+  "zoom": 1.0,
+  "x": 50,
+  "y": 0
+}
+```
+
+Shiny Days:
+
+```json
+{
+  "opacidade": 1.0,
+  "zoom": 1.0,
+  "x": 0,
+  "y": 0
+}
+```
+
+O recorte é centralizado antes dos deslocamentos. No tema de Shiny Days isso mantém as personagens agrupadas no centro do painel lateral sem distorcer a arte.
+
+Em janelas estreitas, a arte lateral pode ser ocultada para preservar espaço para os controles.
+
+Pillow é recomendado para recorte e redimensionamento de alta qualidade:
+
+```powershell
+python -m pip install Pillow
+```
+
+Sem Pillow, Tk 8.6 ainda consegue exibir PNG; o repack nunca depende da arte.
+
+Veja também [TEMAS_GUI.md](TEMAS_GUI.md).
