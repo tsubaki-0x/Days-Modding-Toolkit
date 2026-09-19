@@ -96,6 +96,17 @@ class RepackGuiTests(unittest.TestCase):
                                  self.root.winfo_rooty() + self.root.winfo_height())
         self.assertTrue(any(getattr(widget, 'image', None) for widget in self.app.header.winfo_children()))
 
+    def test_reference_key_switches_visual_theme(self):
+        from unittest.mock import patch as local_patch
+        self.app._reference_theme_stamp = None
+        with local_patch("sdhq_toolkit.gui.repack_app.read_stack_index",
+                         return_value={"index_key_name": "SHINY_DAYS"}):
+            self.app._detect_reference_theme(announce=True)
+        self.root.update()
+        self.assertEqual(self.app.theme_id, "shiny_days")
+        self.assertIn("Shiny Days", self.root.title())
+        self.assertIn("Tema aplicado automaticamente", self.app.status.get())
+
     def test_results_remain_visible_when_resizing(self):
         self.root.attributes('-alpha', 0)
         self.root.deiconify()
