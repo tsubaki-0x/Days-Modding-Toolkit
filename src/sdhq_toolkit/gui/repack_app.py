@@ -1,4 +1,4 @@
-"""Desktop frontend for GARbro-assisted editing and reference repacking."""
+"""Desktop frontend for GPK and Summer Days CRio reference repacking."""
 import os
 import queue
 import subprocess
@@ -9,6 +9,7 @@ from tkinter import ttk, filedialog, messagebox
 
 from .. import __version__
 from ..core.folder_repack import FolderRepackService
+from ..core.summer_days_crio import SummerDaysCRioService
 from ..formats.gpk.index import read_stack_index
 from .controller import JobController
 from .repack_controller import RepackSettings, garbro_status, launch_garbro
@@ -23,7 +24,7 @@ from .scroll_form import ScrollForm
 class RepackApplication:
     def __init__(self, root):
         self.root = root
-        root.title(f'Days ModToolkit {__version__} — School Days HQ / Shiny Days')
+        root.title(f'Days ModToolkit {__version__} — School Days HQ / Shiny Days / Summer Days')
         root.geometry(f'{min(1460, root.winfo_screenwidth() - 60)}x{min(900, root.winfo_screenheight() - 100)}')
         root.minsize(760, 540)
         self.theme_id = DEFAULT_THEME_ID
@@ -61,9 +62,16 @@ class RepackApplication:
         results.columnconfigure(0, weight=1)
         results.rowconfigure(0, weight=1)
         self.header = add_header(frame, __version__, self.theme_profile)
-        ttk.Label(frame, text='School Days HQ / Shiny Days — extraia no GARbro, edite e monte aqui.', font=('Segoe UI', 12, 'bold')).pack(anchor='w')
-        ttk.Label(frame, text='Use uma pasta exclusiva por GPK, preservando os caminhos internos e os formatos.', wraplength=880).pack(anchor='w', pady=(4, 12))
-        fields = ttk.LabelFrame(frame, text='  01  /  Localizações  ', padding=10)
+        self.mode_tabs = ttk.Notebook(frame)
+        self.mode_tabs.pack(fill='x', expand=False, pady=(4, 8))
+        gpk_frame = ttk.Frame(self.mode_tabs, padding=10)
+        summer_frame = ttk.Frame(self.mode_tabs, padding=10)
+        self.mode_tabs.add(gpk_frame, text='School Days HQ / Shiny Days · GPK')
+        self.mode_tabs.add(summer_frame, text='Summer Days · CRio')
+
+        ttk.Label(gpk_frame, text='School Days HQ / Shiny Days — extraia no GARbro, edite e monte aqui.', font=('Segoe UI', 12, 'bold')).pack(anchor='w')
+        ttk.Label(gpk_frame, text='Use uma pasta exclusiva por GPK, preservando os caminhos internos e os formatos.', wraplength=880).pack(anchor='w', pady=(4, 12))
+        fields = ttk.LabelFrame(gpk_frame, text='  01  /  Localizações GPK  ', padding=10)
         fields.pack(fill='x')
         fields.columnconfigure(1, weight=1)
         self.values = {}
@@ -79,10 +87,10 @@ class RepackApplication:
             button.grid(row=row, column=2, padx=(8, 0))
             self.controls.extend([entry, button])
         self.garbro_label = tk.StringVar(value='Não configurado')
-        ttk.Label(frame, textvariable=self.garbro_label).pack(anchor='w', pady=5)
+        ttk.Label(gpk_frame, textvariable=self.garbro_label).pack(anchor='w', pady=5)
         self.values['garbro'].trace_add('write', lambda *_: self.garbro_label.set(garbro_status(self.values['garbro'].get())))
         self.values['reference'].trace_add('write', self._schedule_reference_theme_detection)
-        toolbar = ttk.Frame(frame)
+        toolbar = ttk.Frame(gpk_frame)
         toolbar.pack(fill='x', pady=8)
         for index, (label, callback) in enumerate([('Abrir GARbro', self.open_garbro), ('Conferir alterações', lambda: self.start(False)),
                                 ('Gerar GPK', lambda: self.start(True)), ('Abrir saída', lambda: self.open_path('output')),
@@ -92,6 +100,63 @@ class RepackApplication:
             button.grid(row=index // 3, column=index % 3, sticky='ew', padx=(0, 6), pady=3)
             toolbar.columnconfigure(index % 3, weight=1)
             self.controls.append(button)
+        ttk.Label(gpk_frame, text='Antes de trocar o GPK em Packs, feche o jogo e o GARbro e guarde uma cópia do GPK anterior.',
+                  wraplength=1000).pack(anchor='w', pady=(4, 0))
+
+        ttk.Label(summer_frame, text='Summer Days — CRio de referência → árvore editável → repack.', font=('Segoe UI', 12, 'bold')).pack(anchor='w')
+        ttk.Label(
+            summer_frame,
+            text='Não usa GARbro. O CRio original é a autoridade para árvore, nomes, classes, ordem, offsets e tamanhos. '
+                 'A extração cria <workspace>/<nome do CRio>/ com a árvore completa editável.',
+            wraplength=920,
+        ).pack(anchor='w', pady=(4, 12))
+        summer_fields = ttk.LabelFrame(summer_frame, text='  01  /  Localizações CRio  ', padding=10)
+        summer_fields.pack(fill='x')
+        summer_fields.columnconfigure(1, weight=1)
+        self.summer_values = {}
+        summer_labels = [
+            ('game', 'Instalação do Summer Days (opcional)', False),
+            ('reference', 'CRio de referência', True),
+            ('workspace', 'Workspace de edição', False),
+            ('output', 'Pasta de saída', False),
+            ('reports', 'Pasta de relatórios', False),
+        ]
+        for row, (key, label, file) in enumerate(summer_labels):
+            self.summer_values[key] = tk.StringVar()
+            ttk.Label(summer_fields, text=label).grid(row=row, column=0, sticky='w', padx=(0, 12), pady=3)
+            entry = ttk.Entry(summer_fields, textvariable=self.summer_values[key])
+            entry.grid(row=row, column=1, sticky='ew', pady=3)
+            button = ttk.Button(summer_fields, text='Selecionar…', command=lambda k=key, f=file: self.choose_summer(k, f))
+            button.grid(row=row, column=2, padx=(8, 0))
+            self.controls.extend([entry, button])
+
+        summer_toolbar = ttk.Frame(summer_frame)
+        summer_toolbar.pack(fill='x', pady=8)
+        summer_actions = [
+            ('Ler CRio', self.summer_inspect),
+            ('Extrair CRio', self.summer_extract),
+            ('Conferir alterações', self.summer_validate),
+            ('Gerar CRio', self.summer_repack),
+            ('Abrir workspace', lambda: self.open_summer_path('workspace')),
+            ('Abrir saída', lambda: self.open_summer_path('output')),
+        ]
+        for index, (label, callback) in enumerate(summer_actions):
+            button = ttk.Button(
+                summer_toolbar,
+                text=label,
+                command=lambda cb=callback: self.guard(cb),
+                style='Primary.TButton' if label == 'Gerar CRio' else 'TButton',
+            )
+            button.grid(row=index // 3, column=index % 3, sticky='ew', padx=(0, 6), pady=3)
+            summer_toolbar.columnconfigure(index % 3, weight=1)
+            self.controls.append(button)
+        ttk.Label(
+            summer_frame,
+            text='Metadados técnicos ficam em <workspace>/.crio e não precisam ser editados. '
+                 'Arquivos novos não viram objetos CRio; arquivos removidos bloqueiam o repack.',
+            wraplength=1000,
+        ).pack(anchor='w', pady=(4, 0))
+        self.mode_tabs.bind('<<NotebookTabChanged>>', self._mode_changed)
         self.cancel_button = ttk.Button(frame, text='Cancelar operação', command=self.cancel, state='disabled')
         self.cancel_button.pack(anchor='e')
         self.status = tk.StringVar(value='Pronto. Selecione a referência e a pasta de alterações.')
@@ -119,7 +184,7 @@ class RepackApplication:
                               highlightthickness=1, highlightbackground=colors['light'], padx=8, pady=6)
         self.detail.grid(row=1, column=0, sticky='ew', pady=(8, 0))
         self.table.bind('<<TreeviewSelect>>', self.show_detail)
-        ttk.Label(frame, text='Avisos não bloqueiam a montagem; funcionamento no jogo não garantido.\nAntes de trocar o GPK em Packs, feche o jogo e o GARbro e guarde uma cópia do GPK anterior.', wraplength=1000).pack(anchor='w', pady=5)
+        ttk.Label(frame, text='Avisos de compatibilidade não substituem o teste final no jogo. Preserve sempre o arquivo original de referência.', wraplength=1000).pack(anchor='w', pady=5)
         self.guard(self.load)
         self.form.enable_navigation()
         root.report_callback_exception = lambda kind, error, trace: self.error(error)
@@ -195,10 +260,21 @@ class RepackApplication:
         saved = self.settings.load()
         for key, value in self.values.items():
             value.set(saved.get(key, str(Path.cwd() / key) if key in ('output', 'reports') else ''))
+        summer_defaults = {
+            'game': '',
+            'reference': '',
+            'workspace': str(Path.cwd() / 'summer_workspace'),
+            'output': str(Path.cwd() / 'summer_output'),
+            'reports': str(Path.cwd() / 'reports'),
+        }
+        for key, value in self.summer_values.items():
+            value.set(saved.get('summer_' + key, summer_defaults[key]))
         self.root.after(80, self._detect_reference_theme)
 
     def save(self):
-        self.settings.save({key: value.get().strip() for key, value in self.values.items()})
+        values = {key: value.get().strip() for key, value in self.values.items()}
+        values.update({'summer_' + key: value.get().strip() for key, value in self.summer_values.items()})
+        self.settings.save(values)
 
     def choose(self, key, file):
         def action():
@@ -213,6 +289,136 @@ class RepackApplication:
             else:
                 self.status.set('Seleção cancelada; localização anterior mantida.')
         self.guard(action)
+
+    def _mode_changed(self, *_):
+        if not hasattr(self, 'mode_tabs'):
+            return
+        tab = self.mode_tabs.tab(self.mode_tabs.select(), 'text')
+        if 'Summer Days' in tab:
+            self.root.title(f'Days ModToolkit {__version__} — Summer Days · CRio')
+        else:
+            self._detect_reference_theme()
+
+    def choose_summer(self, key, file):
+        def action():
+            if file:
+                initial = None
+                raw_game = self.summer_values['game'].get().strip()
+                if raw_game:
+                    game = Path(raw_game)
+                    for candidate in (game / 'EXE' / 'rUGP.rio.Op', game / 'rUGP.rio.Op', game):
+                        if candidate.is_dir():
+                            initial = str(candidate)
+                            break
+                value = filedialog.askopenfilename(
+                    parent=self.root,
+                    title='Selecionar CRio de referência',
+                    initialdir=initial,
+                    filetypes=[('Contêiner CRio', '*'), ('Todos os arquivos', '*.*')],
+                )
+            else:
+                value = filedialog.askdirectory(parent=self.root)
+            if value:
+                self.summer_values[key].set(value)
+                self.save()
+                self.status.set('Localização Summer Days salva: ' + value)
+            else:
+                self.status.set('Seleção cancelada; localização anterior mantida.')
+        self.guard(action)
+
+    def _summer_service(self):
+        values = {key: var.get().strip() for key, var in self.summer_values.items()}
+        for key in ('reference', 'workspace', 'output', 'reports'):
+            if not values[key]:
+                raise ValueError('Preencha a localização Summer Days: ' + key)
+        workspace = Path(values['workspace']).resolve()
+        output = Path(values['output']).resolve()
+        reports = Path(values['reports']).resolve()
+        if reports == workspace or workspace in reports.parents:
+            raise ValueError('Escolha relatórios fora do workspace CRio.')
+        if output == workspace or output in workspace.parents or workspace in output.parents:
+            raise ValueError('Workspace e saída CRio devem ficar separados.')
+        return values, SummerDaysCRioService(
+            values['reference'], workspace, output, values['game'] or None
+        )
+
+    def _launch_job(self, name, operation, reports, initial_status):
+        if self.jobs.busy:
+            raise ValueError('Aguarde ou cancele a operação atual.')
+        self.jobs.start(name, operation, Path(reports).resolve())
+        for control in self.controls:
+            control.state(['disabled'])
+        self.cancel_button.state(['!disabled'])
+        self.status.set(initial_status)
+        self.bar.configure(mode='indeterminate')
+        self.bar.start()
+
+    def summer_inspect(self):
+        values, service = self._summer_service()
+        self.save()
+        self._launch_job(
+            'Ler CRio',
+            service.inspect_reference,
+            values['reports'],
+            'Lendo a estrutura CRio de referência…',
+        )
+
+    def summer_extract(self):
+        values, service = self._summer_service()
+        replace = False
+        if service.edit_root.exists() or service.project_root.exists():
+            replace = messagebox.askyesno(
+                'Reextrair CRio',
+                f'Já existe um workspace para {service.name}.\n\n'
+                'Substituir a extração e DESCARTAR as edições atuais desse CRio?',
+                parent=self.root,
+            )
+            if not replace:
+                self.status.set('Extração cancelada; workspace existente preservado.')
+                return
+        self.save()
+        self._launch_job(
+            'Extrair CRio',
+            lambda **kw: service.extract(replace=replace, **kw),
+            values['reports'],
+            'Extraindo o CRio para a árvore editável…',
+        )
+
+    def summer_validate(self):
+        values, service = self._summer_service()
+        self.save()
+        self._launch_job(
+            'Conferir CRio',
+            service.validate,
+            values['reports'],
+            'Comparando a árvore editável com o CRio original…',
+        )
+
+    def summer_repack(self):
+        values, service = self._summer_service()
+        self.save()
+        self._launch_job(
+            'Gerar CRio',
+            service.repack,
+            values['reports'],
+            'Validando e reconstruindo o CRio…',
+        )
+
+    def open_summer_path(self, key):
+        raw = self.summer_values[key].get().strip()
+        if not raw:
+            raise ValueError('Localização Summer Days não configurada: ' + key)
+        path = Path(raw)
+        if key == 'workspace':
+            reference = self.summer_values['reference'].get().strip()
+            if reference:
+                candidate = path / Path(reference).name
+                if candidate.is_dir():
+                    path = candidate
+        if not path.is_dir():
+            raise ValueError('A pasta ainda não existe: ' + str(path))
+        os.startfile(str(path.resolve()))
+        self.status.set('Pasta aberta: ' + str(path))
 
     def open_garbro(self):
         self.save()
@@ -244,13 +450,12 @@ class RepackApplication:
         self.save()
         service = FolderRepackService(values['reference'], folder, values['game'] or None)
         operation = (lambda **kw: service.build(values['output'], **kw)) if build else service.preview
-        self.jobs.start('Gerar GPK' if build else 'Conferir alterações', operation, reports)
-        for control in self.controls:
-            control.state(['disabled'])
-        self.cancel_button.state(['!disabled'])
-        self.status.set('Operação iniciada: lendo a referência e comparando os arquivos…')
-        self.bar.configure(mode='indeterminate')
-        self.bar.start()
+        self._launch_job(
+            'Gerar GPK' if build else 'Conferir alterações',
+            operation,
+            reports,
+            'Operação iniciada: lendo a referência e comparando os arquivos…',
+        )
 
     def cancel(self):
         self.jobs.cancel()
@@ -288,13 +493,18 @@ class RepackApplication:
                     for row in result.get('files', []):
                         if row['state'] != 'manter referência' or row['warnings']:
                             self.table.insert('', 'end', values=(row['path'], row['state'], '\n'.join(row['warnings'])))
-                    if result['operation'] == 'folder_preview':
+                    operation = result.get('operation')
+                    if operation == 'folder_preview':
                         text = f"Conferência concluída: {result['replacements']} substituições, {result['unchanged']} iguais, {result['retained']} mantidos da referência, {len(result['extras'])} novos não incluídos."
+                    elif operation and operation.startswith('crio_'):
+                        text = result.get('message', 'Operação CRio concluída')
+                        if operation == 'crio_repack' and result.get('output'):
+                            text += ': ' + result['output']
                     else:
                         text = result['message'] + ': ' + result['output']
-                    self.status.set(text + f" Avisos: {len(result['warnings'])}. Relatório: {report}")
+                    self.status.set(text + f" Avisos: {len(result.get('warnings', []))}. Relatório: {report}")
                 elif status == 'CANCELLED':
-                    self.status.set('Operação cancelada. Nenhum GPK incompleto foi publicado.')
+                    self.status.set('Operação cancelada. Nenhum arquivo incompleto foi publicado.')
                 else:
                     self.error(f'{name}: {result}\nRelatório: {report}')
         except queue.Empty:
