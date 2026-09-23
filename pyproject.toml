@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "sdhq-modding-toolkit"
 version = "0.13.0.dev1"
-description = "Days ModToolkit: GPK modding toolkit for School Days HQ and Shiny Days"
+description = "Days ModToolkit: GPK/CRio modding toolkit for School Days HQ, Shiny Days and Summer Days"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
