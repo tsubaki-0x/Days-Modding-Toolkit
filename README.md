@@ -3,12 +3,14 @@
 
 # Days ModToolkit
 
-Toolkit não oficial para explorar, validar e reconstruir arquivos **GPK/STACK** da série *Days*, com suporte atual a:
+Toolkit não oficial para explorar, validar e reconstruir arquivos da série *Days*, com suporte atual a:
 
-- **School Days HQ v1.02**
-- **Shiny Days 1.01e** — baseline usado no desenvolvimento
+- **School Days HQ v1.02** — GPK/STACK
+- **Shiny Days 1.01e** — GPK/STACK
+- **Summer Days japonês / rUGP 5.7** — CRio
 
-> **GARbro explora e extrai. Você edita. O Days ModToolkit faz o repack.**
+> **School Days HQ / Shiny Days:** GARbro explora e extrai; o Days ModToolkit faz o repack.  
+> **Summer Days:** o próprio Days ModToolkit extrai, valida e reempacota CRio; GARbro não é usado.
 
 Linha de desenvolvimento atual: **v0.13.0-dev1**.
 
@@ -36,13 +38,14 @@ Se você baixar novamente pelo botão **Code → Download ZIP**, receberá o est
 ## Destaques
 
 - leitura e reconstrução de GPK/STACK;
+- backend CRio de referência para Summer Days, com extração e repack próprios;
 - autodetecção da variante/chave PIDX por arquivo;
 - repack preservando a chave efetivamente detectada no GPK de referência;
 - fluxo principal baseado em **GARbro + pasta editada + GPK original**;
 - validações preventivas antes de publicar a saída;
 - suporte a workspaces, relatórios e pacotes `.sdmod`;
 - ferramentas para CMAP, ORS, PNG, OGG e outros assets já exercitados no projeto;
-- interface gráfica com perfis visuais por jogo;
+- interface gráfica com fluxo GPK e aba exclusiva **Summer Days · CRio**;
 - **tema automático**: ao selecionar um GPK reconhecido, a GUI acompanha o jogo detectado sem alterar a lógica do parser/repack.
 
 ## Jogos suportados
@@ -69,6 +72,25 @@ Baseline técnico:
 - tema próprio de Shiny Days na linha v0.13.
 
 O suporte ao **container GPK/STACK** está implementado. Isso não significa que todo formato interno exclusivo de Shiny Days possua um validador especializado; o teste final no jogo continua obrigatório.
+
+### Summer Days
+
+Suporte atual:
+
+- jogo japonês executado com **rUGP 5.7**;
+- contêineres CRio usados em `rUGP.rio.Op`;
+- seleção de um **CRio original como referência**;
+- extração direta para `<workspace>/<nome do CRio>/...`;
+- manifests/cabeçalho técnicos mantidos separadamente em `<workspace>/.crio/`;
+- validação contra SHA-256 e estrutura da referência;
+- repack com offsets e tamanhos recalculados;
+- sem dependência do GARbro.
+
+A integração preserva a árvore, nomes, classes, ordem e demais metadados da
+referência. Adicionar, remover, renomear ou reordenar objetos CRio não é
+suportado.
+
+Mais detalhes: [docs/SUMMER_DAYS_CRIO.md](docs/SUMMER_DAYS_CRIO.md).
 
 ## Chaves PIDX confirmadas
 
@@ -241,6 +263,7 @@ A linha v0.13 inclui testes específicos para autodetecção multi-game, preserv
 - [GARbro + repack](docs/GARBRO_REPACK.md)
 - [Formato GPK](docs/GPK_FORMAT.md)
 - [Shiny Days](docs/SHINY_DAYS.md)
+- [Summer Days / CRio](docs/SUMMER_DAYS_CRIO.md)
 - [Temas da GUI](docs/TEMAS_GUI.md)
 - [Notas v0.13](docs/RELEASE_v0.13.md)
 - [Notas v0.12](docs/RELEASE_v0.12.md)
