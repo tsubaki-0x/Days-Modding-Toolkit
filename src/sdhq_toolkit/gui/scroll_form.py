@@ -16,6 +16,10 @@ class ScrollForm(ttk.Frame):
         self.body.bind('<Configure>', lambda _: self.canvas.configure(scrollregion=self.canvas.bbox('all')))
         self.canvas.bind('<Configure>', lambda e: self.canvas.itemconfigure(window, width=e.width))
 
+    def set_background(self, color):
+        """Update the canvas background when the active game theme changes."""
+        self.canvas.configure(background=color)
+
     def enable_navigation(self):
         def wheel(event):
             if self.body.winfo_reqheight() > self.canvas.winfo_height():
