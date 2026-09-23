@@ -19,6 +19,8 @@ samples/packs/*
 samples/extracted/*
 workspace/*
 output/*
+/summer_workspace/
+/summer_output/
 backups/*
 reports/*
 research/samples/*
