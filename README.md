@@ -1,124 +1,156 @@
 <img width="1672" height="941" alt="SUZU 2" src="https://github.com/user-attachments/assets/1e6f485d-9b96-4b36-af37-3fcacfc5001e" />
 
-
 # Days ModToolkit
 
-Toolkit não oficial para explorar, validar e reconstruir arquivos da série *Days*, com suporte atual a:
-
-- **School Days HQ v1.02** — GPK/STACK
-- **Shiny Days 1.01e** — GPK/STACK
-- **Summer Days japonês / rUGP 5.7** — CRio
-
-> **School Days HQ / Shiny Days:** GARbro explora e extrai; o Days ModToolkit faz o repack.  
-> **Summer Days:** o próprio Days ModToolkit extrai, valida e reempacota CRio; GARbro não é usado.
+Toolkit não oficial para explorar, validar e reconstruir arquivos da série *Days*.
 
 Linha de desenvolvimento atual: **v0.13.0-dev1**.
 
-O projeto nasceu como *School Days HQ Modding Toolkit* e evoluiu para um toolkit multi-game. O namespace Python `sdhq_toolkit` e alguns nomes de CLI continuam preservados por compatibilidade com versões anteriores.
+O projeto nasceu como *School Days HQ Modding Toolkit* e evoluiu para um toolkit multi-game. O namespace Python 'sdhq_toolkit' e alguns nomes de CLI continuam preservados por compatibilidade histórica.
 
+## Projetos suportados
+
+| Projeto | Base confirmada | Backend | Fluxo | Página |
+|---|---|---|---|---|
+| School Days HQ | **v1.02** | GPK/STACK | GARbro → pasta editada → GPK de referência → repack | [Projeto](projects/SchoolDaysHQ/) |
+| Shiny Days | **1.01e** | GPK/STACK | GARbro → pasta editada → GPK de referência → repack | [Projeto](projects/ShinyDays/) |
+| Summer Days | Japonês / **rUGP 5.7** | CRio | CRio original → workspace → validate → repack | [Projeto](projects/SummerDays/) |
+
+A separação é intencional:
+
+~~~text
+School Days HQ / Shiny Days
+└─ GPK/STACK
+   └─ GARbro para exploração/extração
+      └─ Days ModToolkit para validação e repack
+
+Summer Days
+└─ CRio / rUGP.rio.Op
+   └─ Days ModToolkit extrai, valida e reempacota diretamente
+      └─ GARbro não participa desse fluxo
+~~~
+
+> O backend CRio de Summer Days e a Stage 8C do script 'rUGP.rio' são tecnologias diferentes. O toolkit atual integra o fluxo **CRio de assets**; a Stage 8C especializada continua sendo documentada como backend separado.
 
 ## Como baixar
 
-Este projeto **não usa GitHub Releases**. A versão pública atual fica sempre na branch principal **`days-modtoolkit`**.
+Este projeto **não usa GitHub Releases**. A versão pública atual fica na branch principal de desenvolvimento do repositório.
 
-Para baixar sem usar Git:
+Para baixar sem Git:
 
-1. abra a página principal do repositório;
-2. confirme que a branch selecionada é **`days-modtoolkit-v0.13-dev1`**;
-3. clique no botão verde **Code**;
-4. escolha **Download ZIP**;
-5. extraia o ZIP completamente para uma pasta;
-6. abra a pasta extraída;
-7. execute `run_gui.bat`.
+1. abra a página principal;
+2. selecione a branch pública mais recente;
+3. clique em **Code → Download ZIP**;
+4. extraia o ZIP completamente;
+5. execute 'run_gui.bat'.
 
-> Não execute o toolkit diretamente de dentro do arquivo ZIP. Extraia tudo primeiro para que `src/`, `themes/`, `docs/` e os demais arquivos permaneçam na estrutura esperada.
-
-Se você baixar novamente pelo botão **Code → Download ZIP**, receberá o estado mais recente da branch principal.
+Não execute o toolkit de dentro do ZIP. 'src/', 'themes/', 'docs/' e os demais diretórios precisam permanecer juntos.
 
 ## Destaques
 
 - leitura e reconstrução de GPK/STACK;
-- backend CRio de referência para Summer Days, com extração e repack próprios;
-- autodetecção da variante/chave PIDX por arquivo;
-- repack preservando a chave efetivamente detectada no GPK de referência;
-- fluxo principal baseado em **GARbro + pasta editada + GPK original**;
-- validações preventivas antes de publicar a saída;
-- suporte a workspaces, relatórios e pacotes `.sdmod`;
-- ferramentas para CMAP, ORS, PNG, OGG e outros assets já exercitados no projeto;
-- interface gráfica com fluxo GPK e aba exclusiva **Summer Days · CRio**;
-- **tema automático**: ao selecionar um GPK reconhecido, a GUI acompanha o jogo detectado sem alterar a lógica do parser/repack.
+- autodetecção multi-game do PIDX;
+- preservação da chave efetivamente detectada no GPK de referência;
+- backend CRio próprio para Summer Days;
+- workspaces editáveis e metadados técnicos separados;
+- validações preventivas antes da publicação da saída;
+- suporte a relatórios e pacotes '.sdmod';
+- ferramentas para CMAP, ORS, PNG, OGG, WMV e outros assets já exercitados no projeto;
+- GUI com fluxo GPK e aba exclusiva **Summer Days · CRio**;
+- temas visuais por jogo sem misturar apresentação e lógica de parser/repack.
 
-## Jogos suportados
+## School Days HQ
 
-### School Days HQ
+O suporte original do toolkit nasceu em School Days HQ.
 
-Baseline principal do projeto:
+Resumo técnico:
 
-- **v1.02**
-- 29 GPKs catalogados durante o desenvolvimento;
-- 69.936 entradas no baseline consolidado;
-- testes realizados ao longo do projeto com INI, ORS, CMAP, PNG, OGG e WMV;
-- tema visual padrão da GUI.
+- baseline **v1.02**;
+- **29 GPKs** catalogados durante o desenvolvimento;
+- **69.936 entradas** no baseline consolidado;
+- PIDX/STACK validado;
+- repacks exercitados com INI, ORS, CMAP, PNG, OGG e WMV;
+- suporte a '.sdmod', relatórios e workspaces;
+- tema padrão da GUI.
 
-### Shiny Days
+Tudo que é específico deste jogo foi concentrado em:
 
-Baseline técnico:
+**[projects/SchoolDaysHQ/README.md](projects/SchoolDaysHQ/README.md)**
 
-- **Shiny Days 1.01e**
-- patch oficial JAST 1.01e aplicado antes da extração/repack;
-- PIDX de Shiny Days reconhecido por autodetecção;
-- repack preservando a chave do próprio arquivo de referência;
-- mesmo fluxo GARbro/pasta externa usado em School Days HQ;
-- tema próprio de Shiny Days na linha v0.13.
+## Shiny Days
 
-O suporte ao **container GPK/STACK** está implementado. Isso não significa que todo formato interno exclusivo de Shiny Days possua um validador especializado; o teste final no jogo continua obrigatório.
+Shiny Days reutiliza o backend GPK/STACK, mas possui sua própria chave PIDX e seu próprio baseline.
 
-### Summer Days
+Resumo técnico:
 
-Suporte atual:
+- base **1.01e**;
+- patch oficial JAST aplicado antes dos GPKs usados como referência;
+- chave PIDX específica confirmada;
+- autodetecção por 'index_key_name';
+- writer preserva a proteção detectada no próprio arquivo;
+- mesmo fluxo GARbro/pasta externa/GPK original;
+- tema visual próprio.
 
-- jogo japonês executado com **rUGP 5.7**;
-- contêineres CRio usados em `rUGP.rio.Op`;
-- seleção de um **CRio original como referência**;
-- extração direta para `<workspace>/<nome do CRio>/...`;
-- manifests/cabeçalho técnicos mantidos separadamente em `<workspace>/.crio/`;
-- validação contra SHA-256 e estrutura da referência;
-- repack com offsets e tamanhos recalculados;
-- sem dependência do GARbro.
+Detalhes:
 
-A integração preserva a árvore, nomes, classes, ordem e demais metadados da
-referência. Adicionar, remover, renomear ou reordenar objetos CRio não é
-suportado.
+**[projects/ShinyDays/README.md](projects/ShinyDays/README.md)**
 
-Mais detalhes: [docs/SUMMER_DAYS_CRIO.md](docs/SUMMER_DAYS_CRIO.md).
+## Summer Days
+
+Summer Days exigiu um backend completamente diferente.
+
+A engenharia reversa partiu dos contêineres CRio de:
+
+~~~text
+EXE\rUGP.rio.Op
+~~~
+
+e evoluiu de testes locais para uma ferramenta independente, **Days CRio Universal Tool v1.0.0-alpha2**, até chegar à integração no Days ModToolkit.
+
+Estado canônico que motivou a integração:
+
+~~~text
+73 contêineres CRio
+137.741 objetos
+27 arquivos externos
+73/73 round-trips aprovados
+repack integral aceito pelo jogo
+TITLE modificado e repackado com sucesso
+~~~
+
+A página de Summer Days documenta **todo o caminho**: descoberta do formato, fórmulas de offset/tamanho, 'SEL', falhas intermediárias, alpha1/alpha2, full-tree round-trip, regras de referência, arquitetura do backend, workspace, GUI, tema e entrada no toolkit.
+
+**[projects/SummerDays/README.md](projects/SummerDays/README.md)**
+
+Guia operacional curto: [docs/SUMMER_DAYS_CRIO.md](docs/SUMMER_DAYS_CRIO.md).
 
 ## Chaves PIDX confirmadas
 
-**School Days HQ**
+### School Days HQ
 
-```text
+~~~text
 82 EE 1D B3 57 E9 2C C2 2F 54 7B 10 4C 9A 75 49
-```
+~~~
 
-**Shiny Days**
+### Shiny Days
 
-```text
+~~~text
 F0 D0 BC 05 54 AC 68 A9 F1 7C 8E 3D 64 0B F3 AA
-```
+~~~
 
-Variante adicional conhecida:
+### Variante adicional conhecida
 
-```text
+~~~text
 56 7C 1B 90 B6 FE 3F DB B6 06 79 EA CC 11 A0 4F
-```
+~~~
 
-Uma chave só é aceita quando o PIDX resultante passa pelas verificações estruturais do toolkit.
+Uma candidata só é aceita quando o PIDX resultante passa pelas verificações estruturais do toolkit.
 
-## Temas automáticos da GUI
+## Temas da GUI
 
-A linha v0.13 separa a apresentação da lógica técnica.
+O sistema visual acompanha o projeto sem alterar o backend técnico.
 
-```text
+~~~text
 GPK selecionado
       ↓
 leitura do PIDX
@@ -129,66 +161,85 @@ School    Shiny
 Days HQ   Days
    ↓       ↓
 tema      tema
-```
 
-Mapeamento atual:
+aba Summer Days · CRio
+      ↓
+tema Summer Days
+~~~
 
-```text
-SCHOOL_DAYS_HQ -> tema School Days HQ
-SHINY_DAYS     -> tema Shiny Days
-```
+Mapeamento GPK atual:
 
-A troca pode alterar:
+~~~text
+SCHOOL_DAYS_HQ → themes/school_days
+SHINY_DAYS     → themes/shiny_days
+~~~
 
-- logo;
-- arte lateral;
-- paleta;
-- cores de seleção e progresso;
-- cabeçalho;
-- título da janela.
+Summer Days não depende de PIDX; sua aba aplica diretamente 'themes/summer_days'.
 
-Ela **não** altera a chave, codec, flags, offsets ou writer. O GPK continua sendo a autoridade técnica.
+A troca de tema pode alterar logo, arte lateral, paleta, cabeçalho e título. Ela **não** altera chave, codec, flags, offsets ou writer.
 
 Mais detalhes: [docs/TEMAS_GUI.md](docs/TEMAS_GUI.md).
 
 ## Requisitos
 
-- Windows
-- Python **3.10+** com Tkinter/Tcl-Tk
-- [GARbro](https://github.com/morkt/GARbro) para exploração/extração
-- Pillow recomendado para recorte/redimensionamento da arte lateral:
+- Windows;
+- Python **3.10+** com Tkinter/Tcl-Tk;
+- [GARbro](https://github.com/morkt/GARbro) para o fluxo GPK de School Days HQ/Shiny Days;
+- Pillow recomendado para recursos visuais da GUI.
 
-```powershell
+~~~powershell
 python -m pip install Pillow
-```
+~~~
 
-O jogo, GARbro, GPKs originais e outros assets proprietários não acompanham o toolkit.
+O jogo, GARbro, GPKs originais, CRios originais e outros assets proprietários não acompanham o toolkit.
 
-## Fluxo principal
+## Fluxo GPK — School Days HQ / Shiny Days
 
-1. Abra o GPK desejado no GARbro.
-2. Extraia os arquivos preservando os caminhos internos.
-3. Edite os assets em ferramentas externas.
-4. Abra `run_gui.bat`.
-5. Selecione o **GPK de referência**.
-6. A GUI lê o índice e identifica a variante suportada.
-7. Selecione a **pasta com as alterações**.
-8. Clique em **Conferir alterações**.
-9. Revise as substituições detectadas.
-10. Clique em **Gerar GPK**.
-11. Faça backup do GPK instalado e teste o resultado no jogo.
+1. abra o GPK desejado no GARbro;
+2. extraia os arquivos preservando os caminhos internos;
+3. edite os assets externamente;
+4. abra 'run_gui.bat';
+5. selecione o **GPK de referência**;
+6. selecione a **pasta com as alterações**;
+7. use **Conferir alterações**;
+8. revise as substituições;
+9. use **Gerar GPK**;
+10. faça backup do arquivo instalado e teste no jogo.
 
-O GPK de referência é a autoridade para nomes, ordem, flags, headers, campos desconhecidos, estrutura e proteção do PIDX.
+A referência é a autoridade para nomes, ordem, flags, headers, campos desconhecidos, estrutura e proteção do PIDX.
+
+## Fluxo CRio — Summer Days
+
+1. abra 'run_gui.bat';
+2. entre em **Summer Days · CRio**;
+3. selecione um **CRio original**;
+4. escolha workspace, saída e relatórios;
+5. use **Ler CRio**;
+6. use **Extrair CRio**;
+7. edite apenas '<workspace>/<nome do CRio>/';
+8. use **Conferir alterações**;
+9. use **Gerar CRio**;
+10. substitua somente numa cópia/backup do jogo e teste.
+
+Metadados técnicos ficam em:
+
+~~~text
+<workspace>/.crio/
+~~~
+
+e não devem ser editados manualmente.
+
+A referência usada na validação/repack precisa ser exatamente o mesmo original usado na extração.
 
 ## Autodetecção de PIDX
 
-O núcleo usa:
+O núcleo GPK usa:
 
-```python
+~~~python
 read_stack_index(archive, key=None)
-```
+~~~
 
-A ordem de tentativa inclui:
+A tentativa inclui:
 
 1. chave fornecida/CIPHERCODE, quando existir;
 2. School Days HQ;
@@ -198,68 +249,97 @@ A ordem de tentativa inclui:
 
 O relatório registra:
 
-```text
+~~~text
 index_key_name
 index_key_hex
 index_xor
 index_codec
-```
+~~~
 
 ## Repack seguro
+
+### GPK
 
 O writer:
 
 - relê o GPK de referência;
-- identifica a chave efetiva;
+- detecta a proteção efetiva;
 - preserva entradas não alteradas;
 - recompõe apenas entradas modificadas;
 - recria o PIDX;
-- reutiliza a proteção correspondente ao arquivo de referência;
-- valida o arquivo temporário antes de publicar a saída.
+- reutiliza a mesma proteção;
+- valida o temporário antes de publicar a saída.
 
-Assim, um GPK de Shiny Days não é convertido acidentalmente para a chave de School Days HQ.
+### CRio
+
+O backend:
+
+- valida SHA-256 da referência;
+- preserva árvore, nomes, classes, ordem e flags;
+- recalcula offsets e tamanhos;
+- valida PNG por assinatura/chunks/CRC/resolução;
+- bloqueia remoção de payload esperado;
+- mostra arquivo novo como **novo — não incluído**;
+- nunca sobrescreve a referência;
+- valida antes do repack.
 
 ## CLI
 
-Os comandos continuam disponíveis pelo namespace histórico para compatibilidade:
+Os comandos históricos continuam disponíveis pelo namespace 'sdhq_toolkit' por compatibilidade.
 
-```powershell
+Exemplo GPK:
+
+~~~powershell
 python -m sdhq_toolkit.cli read-index "D:\Shiny Days\Packs\Script.GPK"
-```
-
-`--key-report` é opcional nos fluxos GPK atuais.
-
-
+~~~
 
 ## Limitações atuais
 
-- inclusão de novas entradas no índice ainda não é suportada;
-- remoção e renomeação de entradas ainda não são suportadas;
+### GPK
+
+- inclusão de novas entradas ainda não é suportada;
+- remoção e renomeação ainda não são suportadas;
 - arquivo ausente na pasta externa mantém a entrada da referência;
-- arquivos novos aparecem como **novo — não incluído**;
-- validações de assets são preventivas e não substituem teste real;
-- compatibilidade do container não garante compatibilidade semântica de todo asset interno;
-- não misture GPKs de versões diferentes como referência e origem da edição.
+- arquivos novos não entram automaticamente no índice;
+- não misture GPKs de versões diferentes.
+
+### CRio
+
+- não adiciona objetos;
+- não remove objetos;
+- não renomeia objetos;
+- não reordena objetos;
+- não troca a árvore;
+- mudança de tipo é bloqueada por padrão;
+- PNG deve manter resolução por padrão;
+- compatibilidade estrutural não garante que a engine aceite qualquer codec de áudio/vídeo.
 
 ## Testes
 
-```powershell
+~~~powershell
 $env:PYTHONPATH = "src"
 python -m unittest discover -s tests -q
-```
+~~~
 
-A linha v0.13 inclui testes específicos para autodetecção multi-game, preservação de chave no repack, seleção automática de tema e regressões da GUI.
+Além dos testes sintéticos, o backend CRio de Summer Days passou por round-trip integral da árvore real e por testes em engine com contêiner modificado.
 
 ## Documentação
 
-- [GARbro + repack](docs/GARBRO_REPACK.md)
-- [Formato GPK](docs/GPK_FORMAT.md)
-- [Shiny Days](docs/SHINY_DAYS.md)
-- [Summer Days / CRio](docs/SUMMER_DAYS_CRIO.md)
+### Por projeto
+
+- [School Days HQ](projects/SchoolDaysHQ/)
+- [Shiny Days](projects/ShinyDays/)
+- [Summer Days](projects/SummerDays/)
+
+### Formatos e fluxos compartilhados
+
+- [GARbro + repack GPK](docs/GARBRO_REPACK.md)
+- [Formato GPK/STACK](docs/GPK_FORMAT.md)
+- [Summer Days / guia CRio](docs/SUMMER_DAYS_CRIO.md)
 - [Temas da GUI](docs/TEMAS_GUI.md)
 - [Notas v0.13](docs/RELEASE_v0.13.md)
 - [Notas v0.12](docs/RELEASE_v0.12.md)
-- [Interface anterior e .sdmod](docs/DESKTOP.md)
+- [Interface e .sdmod](docs/DESKTOP.md)
 - [Workspaces parciais](docs/PARTIAL_WORKSPACES.md)
 
 ## Licença e créditos
@@ -268,6 +348,6 @@ Código sob [MIT](LICENSE).
 
 **SUZU / tsubaki-0x** — direção do projeto, testes, documentação e desenvolvimento do toolchain.
 
-School Days, Shiny Days, logos, executáveis e assets pertencem aos respectivos titulares e não são cobertos pela licença MIT deste repositório.
+School Days, Shiny Days, Summer Days, logos, executáveis e assets pertencem aos respectivos titulares e não são cobertos pela licença MIT deste repositório.
 
 Projeto independente e não oficial, sem vínculo com 0verflow, JAST USA ou GARbro.
