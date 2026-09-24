@@ -22,7 +22,7 @@ def test_distribution_includes_summer_days_theme():
     assert data["zoom"] == 1.0
     assert data["x"] == 0
     assert data["y"] == 0
-    assert data["cores"]["red"].upper() == "#F64A11"
+    assert data["cores"]["red"].upper() == "#FB430B"
 
 
 def test_summer_days_profile_uses_same_theme_loader_as_other_games():
@@ -31,4 +31,4 @@ def test_summer_days_profile_uses_same_theme_loader_as_other_games():
     assert profile["nome"] == "Summer Days"
     assert Path(profile["_image_path"]).name == "Fundo.jpg"
     assert Path(profile["_logo_path"]).name == "Logo.jpg"
-    assert profile["cores"]["navy"].upper() == "#212646"
+    assert profile["cores"]["navy"].upper() == "#201524"
