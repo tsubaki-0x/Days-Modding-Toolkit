@@ -14,7 +14,7 @@ from ..formats.gpk.index import read_stack_index
 from .controller import JobController
 from .repack_controller import RepackSettings, garbro_status, launch_garbro
 from .theme import (
-    DEFAULT_THEME_ID, apply_theme, add_header, load_theme_profile, palette,
+    DEFAULT_THEME_ID, SUMMER_THEME_ID, apply_theme, add_header, load_theme_profile, palette,
     theme_for_index_key, update_header,
 )
 from .background import ArtworkPanel
@@ -295,9 +295,18 @@ class RepackApplication:
             return
         tab = self.mode_tabs.tab(self.mode_tabs.select(), 'text')
         if 'Summer Days' in tab:
-            self.root.title(f'Days ModToolkit {__version__} — Summer Days · CRio')
-        else:
+            self.apply_game_theme(SUMMER_THEME_ID)
+            return
+
+        raw = self.values.get('reference').get().strip() if self.values.get('reference') else ''
+        path = Path(raw) if raw else None
+        if path and path.is_file() and path.suffix.lower() == '.gpk':
+            # Force a visual refresh when returning from the Summer Days tab.
+            # The technical GPK autodetection remains the authority for School/Shiny.
+            self._reference_theme_stamp = None
             self._detect_reference_theme()
+        else:
+            self.apply_game_theme(DEFAULT_THEME_ID)
 
     def choose_summer(self, key, file):
         def action():
