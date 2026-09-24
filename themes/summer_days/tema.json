@@ -1,0 +1,21 @@
+{
+  "id": "summer_days",
+  "nome": "Summer Days",
+  "index_keys": [],
+  "logo": "Logo.jpg",
+  "imagem": "Fundo.jpg",
+  "opacidade": 1.0,
+  "zoom": 1.0,
+  "x": 0,
+  "y": 0,
+  "cabecalho": "SUMMER DAYS  /  MODDING TOOLKIT",
+  "subtitulo": "SUMMER DAYS  ·  {version}",
+  "cores": {
+    "sky": "#84B9D7",
+    "light": "#A3D6E7",
+    "white": "#FFFDFC",
+    "navy": "#212646",
+    "ink": "#100E18",
+    "red": "#F64A11"
+  }
+}
