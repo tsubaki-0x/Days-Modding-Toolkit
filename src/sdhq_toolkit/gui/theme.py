@@ -19,6 +19,7 @@ RED = '#C9363E'
 ASSETS = Path(__file__).with_name('assets')
 
 DEFAULT_THEME_ID = 'school_days'
+SUMMER_THEME_ID = 'summer_days'
 KEY_THEME_MAP = {
     'SCHOOL_DAYS_HQ': 'school_days',
     'SHINY_DAYS': 'shiny_days',
