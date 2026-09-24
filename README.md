@@ -207,15 +207,7 @@ python -m sdhq_toolkit.cli read-index "D:\Shiny Days\Packs\Script.GPK"
 
 `--key-report` é opcional nos fluxos GPK atuais.
 
-## Shiny Days 1.01e
 
-Para reproduzir o baseline usado pelo projeto, aplique primeiro o patch oficial **1.01e** da JAST e só então utilize os GPKs como referência.
-
-Página oficial:
-
-https://help.jastusa.com/en/knowledgebase/article/shiny-days-patch-1-01e-and-bugfixes
-
-O patch corrige, entre outros itens, o final da Minami, Route Map, splash screens, Story Route/Kokoro Bad End, uniforme da rota da Inori e pequenos erros de texto.
 
 ## Limitações atuais
 
