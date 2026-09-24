@@ -4,18 +4,18 @@
   "index_keys": [],
   "logo": "Logo.jpg",
   "imagem": "Fundo.jpg",
-  "opacidade": 1.0,
-  "zoom": 1.0,
+  "opacidade": 1,
+  "zoom": 1,
   "x": 0,
   "y": 0,
   "cabecalho": "SUMMER DAYS  /  MODDING TOOLKIT",
   "subtitulo": "SUMMER DAYS  ·  {version}",
   "cores": {
-    "sky": "#84B9D7",
-    "light": "#A3D6E7",
-    "white": "#FFFDFC",
-    "navy": "#212646",
+    "sky": "#85AFD0",
+    "light": "#B5D2E4",
+    "white": "#F1F4F6",
+    "navy": "#201524",
     "ink": "#100E18",
-    "red": "#F64A11"
+    "red": "#FB430B"
   }
 }
