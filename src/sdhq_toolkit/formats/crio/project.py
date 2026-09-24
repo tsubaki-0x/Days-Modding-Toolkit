@@ -219,9 +219,22 @@ def validate_project(
         "issues": issues,
         "all_checks_pass": not issues,
     }
-    write_json(project_root / "REPORTS" / "validation_report.json", report)
+    report_path = project_root / "REPORTS" / "validation_report.json"
+    write_json(report_path, report)
     if issues:
-        raise CRioError(f"validation failed with {len(issues)} issue(s)")
+        lines = []
+        for issue in issues[:5]:
+            path = issue.get("path") or "<unknown>"
+            error = issue.get("error") or "unknown validation error"
+            lines.append(f"{path}: {error}")
+        if len(issues) > 5:
+            lines.append(f"... and {len(issues) - 5} more issue(s)")
+        detail = "\n".join(lines)
+        raise CRioError(
+            f"validation failed with {len(issues)} issue(s):\n"
+            f"{detail}\n"
+            f"Report: {report_path}"
+        )
     print("[VALIDATION PASS]")
     print(f"Entries: {checked}")
     print(f"Containers: {containers}")
