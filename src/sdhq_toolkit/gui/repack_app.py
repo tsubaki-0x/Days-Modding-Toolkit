@@ -315,7 +315,12 @@ class RepackApplication:
                 raw_game = self.summer_values['game'].get().strip()
                 if raw_game:
                     game = Path(raw_game)
-                    for candidate in (game / 'EXE' / 'rUGP.rio.Op', game / 'rUGP.rio.Op', game):
+                    candidates = []
+                    if game.name.casefold() == 'exe':
+                        candidates.extend((game / 'rUGP.rio.Op', game))
+                    else:
+                        candidates.extend((game / 'EXE' / 'rUGP.rio.Op', game / 'rUGP.rio.Op', game))
+                    for candidate in candidates:
                         if candidate.is_dir():
                             initial = str(candidate)
                             break
