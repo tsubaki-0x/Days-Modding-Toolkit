@@ -16,6 +16,14 @@ O projeto nasceu como *School Days HQ Modding Toolkit* e evoluiu para um toolkit
 | Shiny Days | **1.01e** | GPK/STACK | GARbro → pasta editada → GPK de referência → repack | [Projeto](projects/ShinyDays/) |
 | Summer Days | Japonês / **rUGP 5.7** | CRio | CRio original → workspace → validate → repack | [Projeto](projects/SummerDays/) |
 
+## Projeto documentado, mas não suportado
+
+| Projeto | Plataforma | Estado no toolkit | Página |
+|---|---|---|---|
+| Island Days | Nintendo 3DS | **Documentação técnica apenas** — sem backend, GUI, CLI ou garantia de compatibilidade | [Pesquisa](projects/IslandDays/) |
+
+> **Island Days não faz parte do suporte do Days ModToolkit.** A pasta `projects/IslandDays/` preserva a engenharia reversa realizada durante o projeto PT-BR para que modders futuros possam entender a arquitetura do jogo: `script_j`, DARC, BCLIM/BCLYT/BCLAN/BCFNT, encoding, nameplate, batalha e strings do ExeFS/`.code`. Nenhuma dessas rotinas foi integrada ao núcleo do toolkit.
+
 A separação é intencional:
 
 ~~~text
@@ -330,6 +338,7 @@ Além dos testes sintéticos, o backend CRio de Summer Days passou por round-tri
 - [School Days HQ](projects/SchoolDaysHQ/)
 - [Shiny Days](projects/ShinyDays/)
 - [Summer Days](projects/SummerDays/)
+- [Island Days — documentação técnica, não suportado](projects/IslandDays/)
 
 ### Formatos e fluxos compartilhados
 
@@ -348,6 +357,6 @@ Código sob [MIT](LICENSE).
 
 **SUZU / tsubaki-0x** — direção do projeto, testes, documentação e desenvolvimento do toolchain.
 
-School Days, Shiny Days, Summer Days, logos, executáveis e assets pertencem aos respectivos titulares e não são cobertos pela licença MIT deste repositório.
+School Days, Shiny Days, Summer Days, Island Days, logos, executáveis e assets pertencem aos respectivos titulares e não são cobertos pela licença MIT deste repositório.
 
 Projeto independente e não oficial, sem vínculo com 0verflow, JAST USA ou GARbro.
